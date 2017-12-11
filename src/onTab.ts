@@ -16,7 +16,7 @@ type SyntheticKeyboardEvent = React.KeyboardEvent<{}>;
 export const onTab = (
   e: SyntheticKeyboardEvent,
   editorState: Draft.EditorState,
-): Draft.EditorState => {
+): Draft.EditorState | void => {
   e.preventDefault();
 
   if (e.shiftKey) {

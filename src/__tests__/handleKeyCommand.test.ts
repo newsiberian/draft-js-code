@@ -14,7 +14,7 @@ const createWithText = (text: string): Draft.EditorState => {
 
 const initialText = "return 'hello'; // comment";
 // get default indent here
-const indentLength = getIndentation(initialText).length;
+const indentLength = getIndentation();
 // modify string with using default indent
 const insertIndentsBeforeText = (modifier, text = initialText) => {
   const indentsLength = indentLength * modifier;
