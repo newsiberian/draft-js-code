@@ -1,13 +1,10 @@
-// import * as detectIndent from 'detect-indent';
-
-const DEFAULT_INDENTATION = '  ';
+const DEFAULT_INDENTATION = 2;
 
 /**
- * Detect indentation in a text
- * @param {String} text
- * @return {String}
+ * Return default indentation in a text
+ * @return {Number}
  */
-export const getIndentation = (text: string): string => {
+export const getIndentation = (): number => {
   // const result = detectIndent(text);
   // return result.indent || DEFAULT_INDENTATION;
   return DEFAULT_INDENTATION;

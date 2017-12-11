@@ -1,11 +1,13 @@
-const { EditorState, ContentState, SelectionState } = require('draft-js');
-const handleKeyCommand = require('../handleKeyCommand');
-const getIndentation = require('../utils/getIndentation');
-var detectIndent = require('detect-indent');
+import { EditorState, ContentState, SelectionState } from 'draft-js';
+import detectIndent from 'detect-indent';
 
-const toPlainText = editorState =>
+import { handleKeyCommand } from '../handleKeyCommand';
+import { getIndentation } from '../utils/getIndentation';
+
+const toPlainText = (editorState: Draft.EditorState): string =>
   editorState.getCurrentContent().getPlainText();
-const createWithText = text => {
+
+const createWithText = (text: string): Draft.EditorState => {
   const contentState = ContentState.createFromText(text);
   return EditorState.createWithContent(contentState);
 };

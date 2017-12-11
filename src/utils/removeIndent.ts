@@ -3,11 +3,12 @@ import { EditorState, Modifier } from 'draft-js';
 import detectIndent from 'detect-indent';
 
 // import getNewLine from './getNewLine';
-import { getIndentation } from './getIndentation';
+// import { getIndentation } from './getIndentation';
+import { detectIndentation } from './detectIndentation';
 // import getLines from './getLines';
 // import getLineAnchorForOffset from './getLineAnchorForOffset';
 
-export interface INewState {
+export interface NewStateInterface {
   editorState: Draft.EditorState;
   contentState: Draft.ContentState;
   currentIndent?: number;
@@ -39,7 +40,7 @@ export const removeIndent = (
 
   // Detect newline separator and indentation
   // var newLine = getNewLine(blockText);
-  const indent = getIndentation(blockText);
+  const indent = detectIndentation(blockText);
   const currentIndent = detectIndent(blockText).amount;
   // Get current line
   // var lines = getLines(blockText, newLine);
@@ -48,7 +49,7 @@ export const removeIndent = (
   // var currentLine = lines.get(lineAnchor.getLine());
 
   var rangeToRemove;
-  var newState = <INewState>{
+  var newState = <NewStateInterface>{
     editorState: editorState,
     contentState: contentState,
   };
@@ -86,21 +87,6 @@ export const removeIndent = (
         );
         linesIndents[key] = newState.currentIndent;
       });
-
-      var calibratedAnchorOffset = function(offset, lineIndent, indent) {
-        if (lineIndent === 0) {
-          return offset;
-        }
-
-        if (offset < lineIndent) {
-          if (lineIndent > indent) {
-            return offset;
-          }
-          return 0;
-        }
-
-        return lineIndent >= indent ? offset - indent : offset - lineIndent;
-      };
 
       // newState.contentState = !selection.isBackward
       newState.contentState = !selection.getIsBackward()
@@ -147,7 +133,7 @@ export const removeIndent = (
       // we need to remove any number of spaces <= indent.length
       // i.e. if indent is 4, but we have 2 spaces on in the beginning of this line
       // we removing these 2
-      var indentOffset =
+      const indentOffset =
         currentIndent < indent.length ? currentIndent : indent.length;
       // FIXME: this is dummy for testing purpose
       // var indentOffset = currentIndent < 4 ? currentIndent : 4;
@@ -192,7 +178,7 @@ export const removeIndent = (
     ) {
       // if text begins from the position of indent, we should move it to
       // previous line if exist
-      var blockBefore = contentState
+      const blockBefore = contentState
         .getBlockMap()
         .toSeq()
         .takeUntil(contentBlock => contentBlock === currentBlock)
@@ -229,7 +215,7 @@ const removeIndentFromLine = (
   block: Draft.ContentBlock,
   blockKey: string,
   indent: string,
-): INewState => {
+): NewStateInterface => {
   const text = block.getText();
   // var newLine = getNewLine(text);
   // var lines = getLines(text, newLine);
@@ -263,6 +249,21 @@ const removeIndentFromLine = (
   };
 };
 
+const calibratedAnchorOffset = function(offset, lineIndent, indent) {
+  if (lineIndent === 0) {
+    return offset;
+  }
+
+  if (offset < lineIndent) {
+    if (lineIndent > indent) {
+      return offset;
+    }
+    return 0;
+  }
+
+  return lineIndent >= indent ? offset - indent : offset - lineIndent;
+};
+
 const calibrateCursor = (
   contentState: Draft.ContentState,
   selection: Draft.SelectionState,
@@ -285,7 +286,7 @@ const modifyEditorState = (
   editorState: Draft.EditorState,
   contentState: Draft.ContentState,
   rangeToRemove: Draft.SelectionState,
-): INewState => {
+): NewStateInterface => {
   const newContentState = Modifier.removeRange(
     contentState,
     rangeToRemove,

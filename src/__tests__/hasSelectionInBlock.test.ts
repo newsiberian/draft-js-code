@@ -1,11 +1,11 @@
-const { List, Map } = require('immutable');
-const {
+import { List, Map } from 'immutable';
+import {
   ContentBlock,
   ContentState,
   EditorState,
   CharacterMetadata,
-} = require('draft-js');
-const hasSelectionInBlock = require('../hasSelectionInBlock');
+} from 'draft-js';
+import { hasSelectionInBlock } from '../hasSelectionInBlock';
 
 const text = 'const a = "b";';
 const textBlock = new ContentBlock({
@@ -34,7 +34,6 @@ it('should return true if the selected block is a "code-block"', () => {
 });
 
 it('should return true if there is multiple "code-block"s and one is selected', () => {
-  const text = 'const a = "b";';
   const contentState = ContentState.createFromBlockArray([
     codeBlock,
     codeBlock,
@@ -45,7 +44,6 @@ it('should return true if there is multiple "code-block"s and one is selected', 
 });
 
 it('should return false if there is no "code-block"', () => {
-  const text = 'const a = "b";';
   const contentState = ContentState.createFromBlockArray([textBlock]);
   const editorState = EditorState.createWithContent(contentState);
 
@@ -53,7 +51,6 @@ it('should return false if there is no "code-block"', () => {
 });
 
 it('should return false if the selected block is not a "code-block"', () => {
-  const text = 'const a = "b";';
   const contentState = ContentState.createFromBlockArray([
     textBlock,
     codeBlock,

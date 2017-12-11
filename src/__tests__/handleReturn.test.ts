@@ -1,10 +1,5 @@
-const {
-  Modifier,
-  EditorState,
-  ContentState,
-  SelectionState,
-} = require('draft-js');
-const handleReturn = require('../handleReturn');
+import { Modifier, EditorState, ContentState, SelectionState } from 'draft-js';
+import { handleReturn } from '../handleReturn';
 
 const toPlainText = editorState =>
   editorState.getCurrentContent().getPlainText();

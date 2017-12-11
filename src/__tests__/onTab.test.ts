@@ -3,21 +3,35 @@ import { EditorState, ContentState, SelectionState } from 'draft-js';
 import { onTab } from '../onTab';
 import { getIndentation } from '../utils/getIndentation';
 
-const toPlainText = editorState =>
+const toPlainText = (editorState: Draft.EditorState): string =>
   editorState.getCurrentContent().getPlainText();
-const createWithText = text => {
+
+const createWithText = (text: string): Draft.EditorState => {
   const contentState = ContentState.createFromText(text);
   return EditorState.createWithContent(contentState);
 };
 
-const tabs = times => '    '.repeat(times || 1);
+const createSelection = (
+  currentContent: Draft.ContentState,
+): Draft.SelectionState =>
+  SelectionState.createEmpty(
+    currentContent
+      .getBlockMap()
+      .first()
+      .getKey(),
+  );
+
+// const tabs = times => '    '.repeat(times || 1);
 const evt = { preventDefault: jest.fn() };
 const initialText = 'hello    hello';
 
 // get default indent here
-const indentLength = getIndentation(initialText).length;
+const indentLength = getIndentation();
 // modify string with using default indent
-const insertIndentsBeforeText = (modifier, text = initialText) => {
+const insertIndentsBeforeText = (
+  modifier: number,
+  text: string = initialText,
+): string => {
   const indentsLength = indentLength * modifier;
   let textWithIndents = `${text}`;
   for (let i = 0, l = indentsLength; i < l; i++) {
@@ -26,87 +40,84 @@ const insertIndentsBeforeText = (modifier, text = initialText) => {
   return textWithIndents;
 };
 
-it('should insert a tab', () => {
-  const initialText = '';
-  const before = createWithText(initialText);
-  const after = onTab(evt, before);
+describe('on Tab', () => {
+  evt.shiftKey = false;
 
-  expect(toPlainText(before)).toEqual(initialText);
-  expect(toPlainText(after)).toEqual(tabs(1));
-});
+  it('should insert a tab', () => {
+    const before = createWithText(initialText);
+    const after = onTab(evt, before);
 
-it('should prevent the default event behavior', () => {
-  const preventDefault = jest.fn();
-  const evt = { preventDefault };
-  const before = EditorState.createEmpty();
-
-  onTab(evt, before);
-  expect(preventDefault).toHaveBeenCalled();
-});
-
-it('should add a tab to an existing tab', () => {
-  const initialText = tabs(1);
-  const before = createWithText(initialText);
-  const after = onTab(evt, before);
-
-  expect(toPlainText(before)).toEqual(initialText);
-  expect(toPlainText(after)).toEqual(initialText + tabs(1));
-});
-
-it('should replace selected content with the tab', () => {
-  const initialText = 'hello';
-
-  const currentContent = ContentState.createFromText(initialText);
-  const selectInitialtext = SelectionState.createEmpty(
-    currentContent
-      .getBlockMap()
-      .first()
-      .getKey(),
-  );
-  const before = EditorState.create({
-    allowUndo: true,
-    currentContent,
-    // Focus the entire initial word
-    selection: selectInitialtext.set('focusOffset', initialText.length),
+    expect(toPlainText(before)).toEqual(initialText);
+    expect(toPlainText(after)).toEqual(insertIndentsBeforeText(1));
   });
 
-  const after = onTab(evt, before);
-  expect(toPlainText(before)).toEqual(initialText);
-  expect(toPlainText(after)).toEqual(tabs(1));
+  it('should prevent the default event behavior', () => {
+    const preventDefault = jest.fn();
+    const event = { preventDefault };
+    const before = EditorState.createEmpty();
+
+    onTab(event, before);
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  it('should add a tab to an existing tab', () => {
+    const textWithOneTab = insertIndentsBeforeText(1);
+    const before = createWithText(textWithOneTab);
+    const after = onTab(evt, before);
+
+    expect(toPlainText(before)).toEqual(textWithOneTab);
+    expect(toPlainText(after)).toEqual(insertIndentsBeforeText(2));
+  });
+
+  it('should not replace selected content with the tab', () => {
+    const currentContent = ContentState.createFromText(initialText);
+    const selectInitialtext = createSelection(currentContent).set(
+      'focusOffset',
+      initialText.length,
+    );
+
+    const before = EditorState.create({
+      allowUndo: true,
+      currentContent,
+      // Focus the entire initial word
+      selection: selectInitialtext,
+    });
+
+    const after = onTab(evt, before);
+    expect(toPlainText(before)).toEqual(initialText);
+    expect(toPlainText(after)).toEqual(insertIndentsBeforeText(1));
+  });
+
+  it('should keep selection position on indent inserting', () => {});
+
+  it('should correctly indent several selected lines', () => {});
 });
 
-it('should correctly indent several selected lines', () => {});
-
 describe('on Shift+Tab', () => {
-  // common settings
-  evt.shiftKey = true;
-
   it('should correctly delete indentation from any cursor position', () => {
+    evt.shiftKey = true;
+
     const textWithOneIndent = insertIndentsBeforeText(1);
     const expectedText = initialText;
     const currentContent = ContentState.createFromText(textWithOneIndent);
-    const currentBlock = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
-    const cursorAtTheBeginningOfLine = currentBlock
+    const selection = createSelection(currentContent);
+
+    const cursorAtTheBeginningOfLine = selection
       .set('anchorOffset', 0)
       .set('focusOffset', 0);
     // "    hello    hello"
     //  ^ cursor here
-    const cursorAtEndOfLine = currentBlock
+    const cursorAtEndOfLine = selection
       .set('anchorOffset', textWithOneIndent.length)
       .set('focusOffset', textWithOneIndent.length);
     // "    hello    hello"
     //                    ^ cursor here
-    const cursorBeforeFirstWord = currentBlock
+    const cursorBeforeFirstWord = selection
       .set('anchorOffset', 4)
       .set('focusOffset', 4);
     // "    hello    hello"
     //     ^ cursor here
-    const cursorBeforeSecondWord = currentBlock
+    const cursorBeforeSecondWord = selection
       .set('anchorOffset', 13)
       .set('focusOffset', 13);
     // "    hello    hello"
@@ -146,20 +157,18 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly delete indentation with backward and forward selection', () => {
+    evt.shiftKey = true;
+
     const textWithOneIndent = insertIndentsBeforeText(1);
     const expectedText = initialText;
     const currentContent = ContentState.createFromText(textWithOneIndent);
-    const currentBlock = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
-    const backwardSelection = currentBlock
+    const selection = createSelection(currentContent);
+
+    const backwardSelection = selection
       .set('anchorOffset', 7)
       .set('focusOffset', 5);
 
-    const forwardSelection = currentBlock
+    const forwardSelection = selection
       .set('anchorOffset', 5)
       .set('focusOffset', 7);
 
@@ -181,17 +190,15 @@ describe('on Shift+Tab', () => {
   });
 
   it('should do nothing in any cursor position if no indentation presents', () => {
+    evt.shiftKey = true;
+
     const currentContent = ContentState.createFromText(initialText);
-    const currentBlock = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
-    const cursorAtTheBeginningOfLine = currentBlock
+    const selection = createSelection(currentContent);
+
+    const cursorAtTheBeginningOfLine = selection
       .set('anchorOffset', 0)
       .set('focusOffset', 0);
-    const cursorBeforeSecondWord = currentBlock
+    const cursorBeforeSecondWord = selection
       .set('anchorOffset', 9)
       .set('focusOffset', 9);
     // "hello    hello"
@@ -215,15 +222,13 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly move cursor position after remove indentation', () => {
+    evt.shiftKey = true;
+
     const textWithOneIndent = insertIndentsBeforeText(1);
     const currentContent = ContentState.createFromText(textWithOneIndent);
-    const currentBlock = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
-    const cursorBeforeSecondWord = currentBlock
+    const selection = createSelection(currentContent);
+
+    const cursorBeforeSecondWord = selection
       .set('anchorOffset', 13)
       .set('focusOffset', 13);
     // "    hello    hello"
@@ -241,15 +246,12 @@ describe('on Shift+Tab', () => {
   });
 
   it('should delete one indentation per keys pressing', () => {
+    evt.shiftKey = true;
+
     const textWithOneIndent = insertIndentsBeforeText(1);
     const textWithTwoIndents = insertIndentsBeforeText(2);
     const currentContent = ContentState.createFromText(textWithTwoIndents);
-    const selection = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    )
+    const selection = createSelection(currentContent)
       .set('anchorOffset', 9)
       .set('focusOffset', 9);
 
@@ -263,6 +265,8 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly remove indentation for several selected lines', () => {
+    evt.shiftKey = true;
+
     const lineOne = 'function test() {';
     const lineTwo = 'return "This is test";';
     const lineThree = '}';
@@ -273,12 +277,7 @@ ${insertIndentsBeforeText(1, lineThree)}`;
     const contentBlocks = currentContent.getBlockMap();
     const firstBlockKey = contentBlocks.first().getKey();
     const lastBlockKey = contentBlocks.last().getKey();
-    const selection = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
+    const selection = createSelection(currentContent);
     const allBlocksSelection = selection.merge({
       focusKey: lastBlockKey,
       focusOffset: 3, // random offset
