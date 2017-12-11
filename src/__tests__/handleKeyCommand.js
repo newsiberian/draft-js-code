@@ -45,7 +45,7 @@ describe('backspace', () => {
         currentContent
           .getBlockMap()
           .first()
-          .getKey()
+          .getKey(),
       )
         .set('anchorOffset', indentLength)
         .set('focusOffset', indentLength);
@@ -57,7 +57,7 @@ describe('backspace', () => {
         currentContent
           .getBlockMap()
           .first()
-          .getKey()
+          .getKey(),
       )
         .set('anchorOffset', cursor)
         .set('focusOffset', cursor);
@@ -67,7 +67,7 @@ describe('backspace', () => {
       const editorState = EditorState.create({
         allowUndo: true,
         currentContent,
-        selection: cursorAfterIndent
+        selection: cursorAfterIndent,
       });
 
       const result = handleKeyCommand(editorState, 'backspace');
@@ -76,7 +76,7 @@ describe('backspace', () => {
       const editorStateCaseTwo = EditorState.create({
         allowUndo: true,
         currentContent,
-        selection: cursorAfterIndent
+        selection: cursorAfterIndent,
       });
 
       const resultTwo = handleKeyCommand(editorStateCaseTwo, 'backspace');
@@ -93,7 +93,7 @@ describe('backspace', () => {
         currentContent
           .getBlockMap()
           .first()
-          .getKey()
+          .getKey(),
       )
         .set('anchorOffset', cursor)
         .set('focusOffset', cursor);
@@ -103,7 +103,7 @@ describe('backspace', () => {
       const editorState = EditorState.create({
         allowUndo: true,
         currentContent,
-        selection: cursorAfterIndent
+        selection: cursorAfterIndent,
       });
 
       const result = handleKeyCommand(editorState, 'backspace');
@@ -121,12 +121,12 @@ describe('backspace', () => {
       const currentContent = ContentState.createFromText(
         `function () {
 ${textWithIndent}
-  }`
+  }`,
       );
       const cursorAfterIndent = SelectionState.createEmpty(
         currentContent
           .getBlockMap()
-          .findKey(block => block.getText() === textWithIndent)
+          .findKey(block => block.getText() === textWithIndent),
       )
         .set('anchorOffset', indentLength)
         .set('focusOffset', indentLength);
@@ -134,7 +134,7 @@ ${textWithIndent}
       const editorState = EditorState.create({
         allowUndo: true,
         currentContent,
-        selection: cursorAfterIndent
+        selection: cursorAfterIndent,
       });
 
       const result = handleKeyCommand(editorState, 'backspace');
@@ -150,7 +150,7 @@ ${textWithIndent}
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     )
       .set('anchorOffset', 11)
       .set('focusOffset', 11);
@@ -160,7 +160,7 @@ ${textWithIndent}
     const editorState = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorWithinText
+      selection: cursorWithinText,
     });
     expect(handleKeyCommand(editorState, 'backspace')).toBeUndefined();
   });
@@ -173,13 +173,13 @@ ${textWithIndent}
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const editorState = EditorState.create({
       allowUndo: true,
       currentContent,
       // Focus the entire initial word
-      selection: selectInitialtext.set('focusOffset', initialText.length)
+      selection: selectInitialtext.set('focusOffset', initialText.length),
     });
 
     expect(handleKeyCommand(editorState, 'backspace')).toEqual(undefined);

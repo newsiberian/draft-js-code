@@ -6,7 +6,7 @@ var LineAnchor = Immutable.Record({
   line: Number(0),
 
   // Offset in current line
-  offset: Number(0)
+  offset: Number(0),
 });
 
 LineAnchor.prototype.getLine = function() {
@@ -41,7 +41,7 @@ function getLineAnchorForOffset(text, offset, sep) {
 
   return new LineAnchor({
     line: lineIndex - 1,
-    offset: offset - lastLineIndex
+    offset: offset - lastLineIndex,
   });
 }
 

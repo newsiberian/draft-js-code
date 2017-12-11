@@ -2,7 +2,7 @@ const {
   Modifier,
   EditorState,
   ContentState,
-  SelectionState
+  SelectionState,
 } = require('draft-js');
 const handleReturn = require('../handleReturn');
 
@@ -29,7 +29,7 @@ it('should insert a new line at the same level of indentation', () => {
     currentContent
       .getBlockMap()
       .first()
-      .getKey()
+      .getKey(),
   )
     .set('anchorOffset', initialText.length)
     .set('focusOffset', initialText.length);
@@ -37,7 +37,7 @@ it('should insert a new line at the same level of indentation', () => {
     allowUndo: true,
     currentContent,
     // Jump selection to the end of the line
-    selection: afterLastCharacter
+    selection: afterLastCharacter,
   });
   const after = handleReturn({}, before);
 
@@ -52,13 +52,13 @@ it('should replace selected content with a new line', () => {
     currentContent
       .getBlockMap()
       .first()
-      .getKey()
+      .getKey(),
   );
   const before = EditorState.create({
     allowUndo: true,
     currentContent,
     // Focus the entire initial word
-    selection: selectInitialtext.set('focusOffset', initialText.length)
+    selection: selectInitialtext.set('focusOffset', initialText.length),
   });
 
   const after = handleReturn({}, before);

@@ -3,7 +3,7 @@ const {
   ContentBlock,
   ContentState,
   EditorState,
-  CharacterMetadata
+  CharacterMetadata,
 } = require('draft-js');
 const hasSelectionInBlock = require('../hasSelectionInBlock');
 
@@ -14,7 +14,7 @@ const textBlock = new ContentBlock({
   text,
   characterList: new List(text.split('').map(char => new CharacterMetadata())),
   depth: 0,
-  data: new Map()
+  data: new Map(),
 });
 
 const codeBlock = new ContentBlock({
@@ -23,7 +23,7 @@ const codeBlock = new ContentBlock({
   text,
   characterList: new List(text.split('').map(char => new CharacterMetadata())),
   depth: 0,
-  data: new Map()
+  data: new Map(),
 });
 
 it('should return true if the selected block is a "code-block"', () => {
@@ -37,7 +37,7 @@ it('should return true if there is multiple "code-block"s and one is selected', 
   const text = 'const a = "b";';
   const contentState = ContentState.createFromBlockArray([
     codeBlock,
-    codeBlock
+    codeBlock,
   ]);
   const editorState = EditorState.createWithContent(contentState);
 
@@ -56,7 +56,7 @@ it('should return false if the selected block is not a "code-block"', () => {
   const text = 'const a = "b";';
   const contentState = ContentState.createFromBlockArray([
     textBlock,
-    codeBlock
+    codeBlock,
   ]);
   const editorState = EditorState.createWithContent(contentState);
 

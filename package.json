@@ -1,33 +1,47 @@
 {
-  "name": "draft-js-code",
-  "version": "0.3.0",
-  "description": "Collection of utilities to make code blocks edition easy in DraftJS",
-  "main": "./lib/index.js",
+  "name": "draft-js-code-custom",
+  "version": "0.4.0",
+  "description":
+    "Collection of utilities to make code blocks edition easy in DraftJS",
+  "main": "./lib/bundle.umd.js",
+  "module": "./lib/index.js",
+  "jsnext:main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
   "scripts": {
-    "test": "jest --coverage",
+    "build:browser":
+      "browserify -t [ babelify --presets [ es2015 react ] ] ./demo/main.js > ./demo/dist.js; cp ./node_modules/prismjs/themes/prism.css ./demo/prism.css; cp ./node_modules/draft-js/dist/Draft.css ./demo/draft.css",
+    "build": "tsc -p .",
+    "bundle": "rollup -c",
+    "clean": "rimraf lib/* && rimraf coverage/* && rimraf demo/dist.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "precommit": "lint-staged",
-    "prettier": "prettier",
-    "build": "browserify -t [ babelify --presets [ es2015 react ] ] ./demo/main.js > ./demo/dist.js; cp ./node_modules/prismjs/themes/prism.css ./demo/prism.css; cp ./node_modules/draft-js/dist/Draft.css ./demo/draft.css",
+    "prelint": "npm run lint-fix",
+    "lint": "tslint -p tsconfig.json -c tslint.json src/*.ts",
+    "lint-fix":
+      "prettier --trailing-comma all --single-quote --write \"src/**/*.{j,t}s*\"",
+    "lint-staged": "lint-staged",
     "deploy": "npm run build; gh-pages -d ./demo",
-    "watch": "watch 'npm run build' ./lib",
+    "watch": "tsc -w -p .",
     "serve": "http-server -p 9090 demo/",
-    "start": "npm run build; parallelshell 'npm run serve -s' 'npm run watch -s'",
-    "postpublish": "npm run deploy"
+    "start":
+      "npm run build:browser; parallelshell 'npm run serve -s' 'npm run watch -s'",
+    "prebuild": "npm run clean",
+    "postbuild": "npm run bundle",
+    "postpublish": "npm run deploy",
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SamyPesse/draft-js-code.git"
   },
-  "keywords": [
-    "draft-js"
-  ],
+  "keywords": ["draft-js"],
   "lint-staged": {
-    "*.js": [
-      "npm run prettier -- --write",
+    "*.ts*": [
+      "prettier --trailing-comma all --single-quote --write",
       "git add"
-    ]
+    ],
+    "*.js*": ["prettier --trailing-comma all --single-quote --write", "git add"]
   },
+  "pre-commit": "lint-staged",
   "author": "Samy Pesse <samypesse@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
@@ -35,33 +49,47 @@
   },
   "homepage": "https://github.com/SamyPesse/draft-js-code#readme",
   "dependencies": {
-    "detect-indent": "^4.0.0",
+    "detect-indent": "5.0.0",
     "detect-newline": "^2.1.0",
-    "ends-with": "^0.2.0",
+    "ends-with": "1.0.1",
     "immutable": "3.x"
   },
   "devDependencies": {
+    "@types/draft-js": "^0.10.19",
+    "@types/jest": "^21.1.8",
+    "@types/react": "^16.0.28",
     "babel-preset-es2015": "^6.6.0",
     "babel-preset-react": "^6.5.0",
-    "babelify": "^7.2.0",
-    "browserify": "^13.0.0",
-    "coveralls": "^2.13.1",
+    "babelify": "8.0.0",
+    "browserify": "14.5.0",
+    "coveralls": "3.0.0",
     "draft-js": "0.x",
     "draft-js-prism": "^1.0.2",
-    "eslint": "^2.11.1",
-    "gh-pages": "^0.11.0",
-    "http-server": "^0.9.0",
-    "husky": "^0.14.3",
+    "eslint": "4.13.0",
+    "http-server": "0.10.0",
     "jest": "^21.1.0",
-    "lint-staged": "^4.2.2",
-    "parallelshell": "2.0.0",
+    "lint-staged": "6.0.0",
+    "parallelshell": "3.0.2",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.7.0",
     "prismjs": "^1.8.1",
-    "react": "^15.1.0",
-    "react-dom": "^15.1.0",
-    "watch": "^0.18.0"
+    "react": "16.2.0",
+    "react-dom": "16.2.0",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.52.1",
+    "ts-jest": "^21.2.4",
+    "tslint": "^5.8.0",
+    "typescript": "^2.7.0-dev.20171209",
+    "uglify-js": "^3.2.2"
   },
   "peerDependencies": {
     "draft-js": "0.x"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": ["ts", "tsx", "js", "json"]
   }
 }

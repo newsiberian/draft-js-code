@@ -3,23 +3,11 @@ const React = require('react');
 const Immutable = require('immutable');
 const ReactDOM = require('react-dom');
 const PrismDraftDecorator = require('draft-js-prism');
-const CodeUtils = require('../');
+const CodeUtils = require('../lib');
 
-const {
-  Editor,
-  EditorState,
-  RichUtils,
-  DefaultDraftBlockRenderMap,
-  Decorator,
-  convertFromRaw
-} = Draft;
+const { Editor, EditorState, RichUtils, convertFromRaw } = Draft;
 
 const { Map, List } = Immutable;
-
-var FIRST_CODE =
-  'var message = "Hello World"\n    + "with four spaces indentation"\n\nconsole.log(message);';
-var SECOND_CODE =
-  'var message = "Hello World"\n  + "with 2 spaces indentation"\n\nconsole.log(message);';
 
 class PrismEditorExample extends React.Component {
   constructor(props) {
@@ -31,30 +19,54 @@ class PrismEditorExample extends React.Component {
       blocks: [
         {
           type: 'header-one',
-          text: 'Demo for draft-js-code'
+          text: 'Demo for draft-js-code',
         },
         {
           type: 'unstyled',
           text:
-            'Type some JavaScript below, Use "Command+Return" (or "Ctrl+Return" on Windows) to split/exit a code blocks:'
+            'Type some JavaScript below, Use "Command+Return" (or "Ctrl+Return" on Windows) to split/exit a code blocks:',
         },
         {
           type: 'code-block',
-          text: FIRST_CODE
+          text: 'var message = "Hello World"',
+        },
+        {
+          type: 'code-block',
+          text: '    + "with four spaces indentation"',
+        },
+        {
+          type: 'code-block',
+          text: '',
+        },
+        {
+          type: 'code-block',
+          text: 'console.log(message);',
         },
         {
           type: 'unstyled',
-          text: 'And this is a code block with 2 spaces indentation'
+          text: 'And this is a code block with 2 spaces indentation',
         },
         {
           type: 'code-block',
-          text: SECOND_CODE
-        }
-      ]
+          text: 'var message = "Hello World"',
+        },
+        {
+          type: 'code-block',
+          text: '  + "with 2 spaces indentation"',
+        },
+        {
+          type: 'code-block',
+          text: '',
+        },
+        {
+          type: 'code-block',
+          text: 'console.log(message);',
+        },
+      ],
     });
 
     this.state = {
-      editorState: EditorState.createWithContent(contentState, decorator)
+      editorState: EditorState.createWithContent(contentState, decorator),
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -107,7 +119,7 @@ class PrismEditorExample extends React.Component {
 
   _toggleInlineStyle(inlineStyle) {
     this.onChange(
-      RichUtils.toggleInlineStyle(this.state.editorState, inlineStyle)
+      RichUtils.toggleInlineStyle(this.state.editorState, inlineStyle),
     );
   }
 
@@ -186,8 +198,8 @@ const styleMap = {
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
     fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
     fontSize: 16,
-    padding: 2
-  }
+    padding: 2,
+  },
 };
 
 function getBlockStyle(block) {
@@ -232,7 +244,7 @@ const BLOCK_TYPES = [
   { label: 'Blockquote', style: 'blockquote' },
   { label: 'UL', style: 'unordered-list-item' },
   { label: 'OL', style: 'ordered-list-item' },
-  { label: 'Code Block', style: 'code-block' }
+  { label: 'Code Block', style: 'code-block' },
 ];
 
 const BlockStyleControls = props => {
@@ -262,7 +274,7 @@ var INLINE_STYLES = [
   { label: 'Bold', style: 'BOLD' },
   { label: 'Italic', style: 'ITALIC' },
   { label: 'Underline', style: 'UNDERLINE' },
-  { label: 'Monospace', style: 'CODE' }
+  { label: 'Monospace', style: 'CODE' },
 ];
 
 const InlineStyleControls = props => {

@@ -1,0 +1,10 @@
+.idea/
+coverage/
+dist/tests/
+demo/
+src/
+tests/
+tsconfig.json
+tslint.json
+typings.d.ts
+yarn.lock

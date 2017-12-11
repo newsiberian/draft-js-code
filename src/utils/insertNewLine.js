@@ -30,7 +30,7 @@ function insertNewLine(editorState) {
     var currentLineIndex = getLineAnchorForOffset(
       blockText,
       startOffset,
-      newLine
+      newLine,
     ).getLine();
     var currentLine = lines.get(currentLineIndex);
     var lineToInsert = newLine + getIndentForLine(currentLine);
@@ -38,25 +38,25 @@ function insertNewLine(editorState) {
     newContentState = Draft.Modifier.insertText(
       contentState,
       selection,
-      lineToInsert
+      lineToInsert,
     );
   } else {
     newContentState = Draft.Modifier.replaceText(
       contentState,
       selection,
-      newLine
+      newLine,
     );
   }
 
   var newEditorState = Draft.EditorState.push(
     editorState,
     newContentState,
-    'insert-characters'
+    'insert-characters',
   );
 
   return Draft.EditorState.forceSelection(
     newEditorState,
-    newContentState.getSelectionAfter()
+    newContentState.getSelectionAfter(),
   );
 }
 

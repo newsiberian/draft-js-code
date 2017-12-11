@@ -1,4 +1,9 @@
-# draft-js-code
+# draft-js-code-editor
+
+This is a fork of [draft-js-code](https://github.com/SamyPesse/draft-js-code)
+
+### Attention
+It differs from the original package by slanting to work in conditions where each line is a separate `CodeBlock`. You must provide such conditions by yourself.
 
 [![NPM version](https://badge.fury.io/js/draft-js-code.svg)](http://badge.fury.io/js/draft-js-code)
 [![Coverage Status](https://coveralls.io/repos/github/SamyPesse/draft-js-code/badge.svg?branch=master)](https://coveralls.io/github/SamyPesse/draft-js-code?branch=master)

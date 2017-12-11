@@ -1,6 +1,7 @@
-const { EditorState, ContentState, SelectionState } = require('draft-js');
-const onTab = require('../onTab');
-const getIndentation = require('../utils/getIndentation');
+import { EditorState, ContentState, SelectionState } from 'draft-js';
+
+import { onTab } from '../onTab';
+import { getIndentation } from '../utils/getIndentation';
 
 const toPlainText = editorState =>
   editorState.getCurrentContent().getPlainText();
@@ -60,13 +61,13 @@ it('should replace selected content with the tab', () => {
     currentContent
       .getBlockMap()
       .first()
-      .getKey()
+      .getKey(),
   );
   const before = EditorState.create({
     allowUndo: true,
     currentContent,
     // Focus the entire initial word
-    selection: selectInitialtext.set('focusOffset', initialText.length)
+    selection: selectInitialtext.set('focusOffset', initialText.length),
   });
 
   const after = onTab(evt, before);
@@ -88,7 +89,7 @@ describe('on Shift+Tab', () => {
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const cursorAtTheBeginningOfLine = currentBlock
       .set('anchorOffset', 0)
@@ -114,7 +115,7 @@ describe('on Shift+Tab', () => {
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorAtTheBeginningOfLine
+      selection: cursorAtTheBeginningOfLine,
     });
     const after = onTab(evt, before);
     expect(toPlainText(after)).toEqual(expectedText);
@@ -122,7 +123,7 @@ describe('on Shift+Tab', () => {
     const secondCaseBefore = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorAtEndOfLine
+      selection: cursorAtEndOfLine,
     });
     const secondCaseAfter = onTab(evt, secondCaseBefore);
     expect(toPlainText(secondCaseAfter)).toEqual(expectedText);
@@ -130,7 +131,7 @@ describe('on Shift+Tab', () => {
     const thirdCaseBefore = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorBeforeFirstWord
+      selection: cursorBeforeFirstWord,
     });
     const thirdCaseAfter = onTab(evt, thirdCaseBefore);
     expect(toPlainText(thirdCaseAfter)).toEqual(expectedText);
@@ -138,7 +139,7 @@ describe('on Shift+Tab', () => {
     const fourthCaseBefore = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorBeforeSecondWord
+      selection: cursorBeforeSecondWord,
     });
     const fourthCaseAfter = onTab(evt, fourthCaseBefore);
     expect(toPlainText(fourthCaseAfter)).toEqual(expectedText);
@@ -152,7 +153,7 @@ describe('on Shift+Tab', () => {
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const backwardSelection = currentBlock
       .set('anchorOffset', 7)
@@ -165,7 +166,7 @@ describe('on Shift+Tab', () => {
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: backwardSelection
+      selection: backwardSelection,
     });
     const after = onTab(evt, before);
     expect(toPlainText(after)).toEqual(expectedText);
@@ -173,7 +174,7 @@ describe('on Shift+Tab', () => {
     const beforeTwo = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: forwardSelection
+      selection: forwardSelection,
     });
     const afterTwo = onTab(evt, beforeTwo);
     expect(toPlainText(afterTwo)).toEqual(expectedText);
@@ -185,7 +186,7 @@ describe('on Shift+Tab', () => {
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const cursorAtTheBeginningOfLine = currentBlock
       .set('anchorOffset', 0)
@@ -199,7 +200,7 @@ describe('on Shift+Tab', () => {
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorAtTheBeginningOfLine
+      selection: cursorAtTheBeginningOfLine,
     });
     const after = onTab(evt, before);
     expect(toPlainText(after)).toEqual(initialText);
@@ -207,7 +208,7 @@ describe('on Shift+Tab', () => {
     const beforeSecondCase = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorBeforeSecondWord
+      selection: cursorBeforeSecondWord,
     });
     const afterSecondCase = onTab(evt, beforeSecondCase);
     expect(toPlainText(afterSecondCase)).toEqual(initialText);
@@ -220,7 +221,7 @@ describe('on Shift+Tab', () => {
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const cursorBeforeSecondWord = currentBlock
       .set('anchorOffset', 13)
@@ -232,7 +233,7 @@ describe('on Shift+Tab', () => {
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: cursorBeforeSecondWord
+      selection: cursorBeforeSecondWord,
     });
     const after = onTab(evt, before);
     const selection = after.getSelection();
@@ -247,7 +248,7 @@ describe('on Shift+Tab', () => {
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     )
       .set('anchorOffset', 9)
       .set('focusOffset', 9);
@@ -255,7 +256,7 @@ describe('on Shift+Tab', () => {
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection
+      selection,
     });
     const after = onTab(evt, before);
     expect(toPlainText(after)).toEqual(textWithOneIndent);
@@ -276,26 +277,26 @@ ${insertIndentsBeforeText(1, lineThree)}`;
       currentContent
         .getBlockMap()
         .first()
-        .getKey()
+        .getKey(),
     );
     const allBlocksSelection = selection.merge({
       focusKey: lastBlockKey,
       focusOffset: 3, // random offset
       anchorKey: firstBlockKey,
-      anchorOffset: 4 // random offset
+      anchorOffset: 4, // random offset
     });
 
     const before = EditorState.create({
       allowUndo: true,
       currentContent,
-      selection: allBlocksSelection
+      selection: allBlocksSelection,
     });
     const after = onTab(evt, before);
 
     expect(toPlainText(after)).toEqual(
       `${lineOne}
 ${insertIndentsBeforeText(1, lineTwo)}
-${lineThree}`
+${lineThree}`,
     );
   });
 });

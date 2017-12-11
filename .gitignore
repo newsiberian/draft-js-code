@@ -35,3 +35,15 @@ node_modules
 demo/dist.js
 demo/draft.css
 demo/prism.css
+
+# don't commit compiled files
+lib
+benchmark_lib
+test-lib
+dist
+npm
+!flow-typed/npm
+
+# lock files
+yarn.lock
+package-lock.json

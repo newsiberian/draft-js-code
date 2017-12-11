@@ -1,4 +1,6 @@
-var removeIndent = require('./utils/removeIndent');
+import { removeIndent } from './utils/removeIndent';
+
+import * as Draft from 'draft-js';
 
 /**
  * Handle key command for code blocks
@@ -7,10 +9,11 @@ var removeIndent = require('./utils/removeIndent');
  * @param {String} command
  * @return {Boolean}
  */
-function handleKeyCommand(editorState, command) {
+export const handleKeyCommand = (
+  editorState: Draft.EditorState,
+  command: Draft.DraftEditorCommand,
+): any => {
   if (command === 'backspace') {
     return removeIndent(editorState, false);
   }
-}
-
-module.exports = handleKeyCommand;
+};
