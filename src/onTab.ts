@@ -66,5 +66,6 @@ const moveTextWithSelectionCalibration = (
         focusOffset: selection.getFocusOffset() + getIndentation(),
       }),
     ),
+    selectionBefore: selection,
   });
 };

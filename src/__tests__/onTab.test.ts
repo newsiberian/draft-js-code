@@ -88,7 +88,75 @@ describe('on Tab', () => {
     expect(toPlainText(after)).toEqual(insertIndentsBeforeText(1));
   });
 
-  it('should keep selection position on indent inserting', () => {});
+  it('should keep selection position on indent inserting', () => {
+    const currentContent = ContentState.createFromText(initialText);
+    // forward selection
+    const forwardSelection = createSelection(currentContent)
+      .set('anchorOffset', 1)
+      .set('focusOffset', 3);
+
+    const forwardOneBefore = EditorState.create({
+      allowUndo: true,
+      currentContent,
+      // Focus the entire initial word
+      selection: forwardSelection,
+    });
+    const forwardOneAfter = onTab(evt, forwardOneBefore);
+    const selectionAfterFirstforwardMove = forwardOneAfter.getSelection();
+    expect(selectionAfterFirstforwardMove.toJS()).toHaveProperty(
+      'anchorOffset',
+      1 + getIndentation(),
+    );
+    expect(selectionAfterFirstforwardMove.toJS()).toHaveProperty(
+      'focusOffset',
+      3 + getIndentation(),
+    );
+
+    // second iteration
+    const forwardTwoBefore = onTab(evt, forwardOneAfter);
+    const selectionAfterSecondforwardMove = forwardTwoBefore.getSelection();
+    expect(selectionAfterSecondforwardMove.toJS()).toHaveProperty(
+      'anchorOffset',
+      1 + getIndentation() * 2,
+    );
+    expect(selectionAfterSecondforwardMove.toJS()).toHaveProperty(
+      'focusOffset',
+      3 + getIndentation() * 2,
+    );
+
+    const backwardSelection = createSelection(currentContent)
+      .set('anchorOffset', 3)
+      .set('focusOffset', 1);
+
+    const backwardOneBefore = EditorState.create({
+      allowUndo: true,
+      currentContent,
+      // Focus the entire initial word
+      selection: backwardSelection,
+    });
+    const backwardOneAfter = onTab(evt, backwardOneBefore);
+    const selectionAfterFirstBackwardMove = backwardOneAfter.getSelection();
+    expect(selectionAfterFirstBackwardMove.toJS()).toHaveProperty(
+      'anchorOffset',
+      3 + getIndentation(),
+    );
+    expect(selectionAfterFirstBackwardMove.toJS()).toHaveProperty(
+      'focusOffset',
+      1 + getIndentation(),
+    );
+
+    // second iteration
+    const backwardTwoBefore = onTab(evt, backwardOneAfter);
+    const selectionAfterSecondBackwardMove = backwardTwoBefore.getSelection();
+    expect(selectionAfterSecondBackwardMove.toJS()).toHaveProperty(
+      'anchorOffset',
+      3 + getIndentation() * 2,
+    );
+    expect(selectionAfterSecondBackwardMove.toJS()).toHaveProperty(
+      'focusOffset',
+      1 + getIndentation() * 2,
+    );
+  });
 
   it('should correctly indent several selected lines', () => {});
 });
