@@ -5,13 +5,16 @@ import detectIndent from 'detect-indent';
 // import getNewLine from './getNewLine';
 // import { getIndentation } from './getIndentation';
 import { detectIndentation } from './detectIndentation';
-// import getLines from './getLines';
-// import getLineAnchorForOffset from './getLineAnchorForOffset';
 
 export interface NewStateInterface {
   editorState: Draft.EditorState;
   contentState: Draft.ContentState;
   currentIndent?: number;
+}
+
+interface TargetInterface {
+  key: string;
+  offset: number;
 }
 
 /**
@@ -24,7 +27,7 @@ export interface NewStateInterface {
 export const removeIndent = (
   editorState: Draft.EditorState,
   isShiftTab: boolean,
-) => {
+): Draft.EditorState | void => {
   const contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
 
@@ -38,20 +41,12 @@ export const removeIndent = (
   const currentBlock = contentState.getBlockForKey(startKey);
   const blockText = currentBlock.getText();
 
-  // Detect newline separator and indentation
-  // var newLine = getNewLine(blockText);
   const indent = detectIndentation(blockText);
   const currentIndent = detectIndent(blockText).amount;
-  // Get current line
-  // var lines = getLines(blockText, newLine);
-  // var lineAnchor = getLineAnchorForOffset(blockText, startOffset, newLine);
 
-  // var currentLine = lines.get(lineAnchor.getLine());
-
-  var rangeToRemove;
-  var newState = <NewStateInterface>{
-    editorState: editorState,
-    contentState: contentState,
+  const newState = <NewStateInterface>{
+    editorState,
+    contentState,
   };
 
   if (isShiftTab) {
@@ -59,11 +54,11 @@ export const removeIndent = (
     // we should remove indent from each (if possible)
     const endKey = selection.getEndKey();
     if (endKey !== startKey) {
-      var state = false;
-      var endPassed = false;
+      let state = false;
+      let endPassed = false;
       // we need to collect selected lines indents for further selection calibration
-      var linesIndents = {};
-      var selectedBlocksRange = contentState
+      const linesIndents = {};
+      const selectedBlocksRange = contentState
         .getBlockMap()
         .filter((value, key) => {
           if (endPassed) {
@@ -77,7 +72,12 @@ export const removeIndent = (
         });
 
       selectedBlocksRange.forEach((block, key) => {
-        newState = removeIndentFromLine(
+        // destructuring with renaming
+        const {
+          editorState: newEditorState,
+          contentState: newContentState,
+          currentIndent: newCurrentIndent,
+        } = removeIndentFromLine(
           newState.editorState,
           newState.contentState,
           selection,
@@ -85,10 +85,12 @@ export const removeIndent = (
           key,
           indent,
         );
-        linesIndents[key] = newState.currentIndent;
+        linesIndents[key] = newCurrentIndent;
+        newState.editorState = newEditorState;
+        newState.contentState = newContentState;
+        newState.currentIndent = newCurrentIndent;
       });
 
-      // newState.contentState = !selection.isBackward
       newState.contentState = !selection.getIsBackward()
         ? calibrateCursor(
             newState.contentState,
@@ -105,7 +107,6 @@ export const removeIndent = (
               linesIndents[endKey],
               indent.length,
             ),
-            // selection.getIsBackward(),
           )
         : calibrateCursor(
             newState.contentState,
@@ -122,8 +123,12 @@ export const removeIndent = (
               linesIndents[startKey],
               indent.length,
             ),
-            // selection.getIsBackward(),
           );
+
+      return forceSelection({
+        editorState: newState.editorState,
+        contentState: newState.contentState,
+      });
     } else {
       // exit if no indent
       if (blockText[0] !== ' ') {
@@ -135,9 +140,8 @@ export const removeIndent = (
       // we removing these 2
       const indentOffset =
         currentIndent < indent.length ? currentIndent : indent.length;
-      // FIXME: this is dummy for testing purpose
-      // var indentOffset = currentIndent < 4 ? currentIndent : 4;
-      rangeToRemove = selection.merge({
+
+      const rangeToRemove = <Draft.SelectionState>selection.merge({
         focusKey: startKey,
         focusOffset: indentOffset,
         anchorKey: startKey,
@@ -145,25 +149,26 @@ export const removeIndent = (
         isBackward: false,
       });
 
-      newState = modifyEditorState(editorState, contentState, rangeToRemove);
-      newState.contentState = calibrateCursor(
-        newState.contentState,
+      const modifiedSingleLineState = modifyEditorState(
+        editorState,
+        contentState,
+        rangeToRemove,
+      );
+      modifiedSingleLineState.contentState = calibrateCursor(
+        modifiedSingleLineState.contentState,
         selection,
         startKey,
         endKey,
         selection.get('anchorOffset') - indent.length,
-        // FIXME: this is dummy for testing purpose
-        // selection.get('anchorOffset') - 4,
         selection.get('focusOffset') - indent.length,
-        // FIXME: this is dummy for testing purpose
-        // selection.get('focusOffset') - 4
       );
+
+      return forceSelection(modifiedSingleLineState);
     }
   } else {
-    var targetKey;
-    var targetOffset;
-    var isCursorOffsetEqualToIndent = currentIndent === startOffset;
-    var isIndentLowerThanNativeIndent = currentIndent < indent.length;
+    const target = <TargetInterface>{};
+    const isCursorOffsetEqualToIndent = currentIndent === startOffset;
+    const isIndentLowerThanNativeIndent = currentIndent < indent.length;
 
     if (
       currentIndent < startOffset ||
@@ -172,40 +177,43 @@ export const removeIndent = (
       // second check for cases when text is closer to the line beginning than
       // indent, then we don't do anything here
       return;
+    }
+
+    // if text begins from the position of indent, we should move it to
+    // previous line if exist
+    const blockBefore = contentState
+      .getBlockMap()
+      .toSeq()
+      .takeUntil(contentBlock => contentBlock === currentBlock)
+      .last();
+
+    if (typeof blockBefore === 'undefined') {
+      // move text to the beginning of line if this is a first line of parent
+      // block
+      target.offset = 0;
     } else if (
       startOffset <= currentIndent &&
       currentIndent === indent.length
     ) {
-      // if text begins from the position of indent, we should move it to
-      // previous line if exist
-      const blockBefore = contentState
-        .getBlockMap()
-        .toSeq()
-        .takeUntil(contentBlock => contentBlock === currentBlock)
-        .last();
-
-      if (typeof blockBefore !== 'undefined') {
-        targetKey = blockBefore.getKey();
-        targetOffset = blockBefore.getLength();
-      }
+      // move text to the end of previous block
+      target.key = blockBefore.getKey();
+      target.offset = blockBefore.getLength();
     }
 
     // Remove space before indent
-    rangeToRemove = selection.merge({
-      focusKey: targetKey || startKey,
-      focusOffset: targetKey ? targetOffset : indent.length,
+    const rangeToRemove = <Draft.SelectionState>selection.merge({
+      focusKey: target.key || startKey,
+      focusOffset:
+        typeof target.offset === 'number' ? target.offset : indent.length,
       anchorKey: startKey,
       anchorOffset: currentIndent,
       isBackward: true,
     });
 
-    newState = modifyEditorState(editorState, contentState, rangeToRemove);
+    return forceSelection(
+      modifyEditorState(editorState, contentState, rangeToRemove),
+    );
   }
-
-  return EditorState.forceSelection(
-    newState.editorState,
-    newState.contentState.getSelectionAfter(),
-  );
 };
 
 const removeIndentFromLine = (
@@ -217,17 +225,13 @@ const removeIndentFromLine = (
   indent: string,
 ): NewStateInterface => {
   const text = block.getText();
-  // var newLine = getNewLine(text);
-  // var lines = getLines(text, newLine);
-  // var lineAnchor = getLineAnchorForOffset(text, 0, newLine);
-  // var currentLine = lines.get(lineAnchor.getLine());
   const currentIndent = detectIndent(text).amount;
 
   if (currentIndent === 0) {
     return {
-      editorState: editorState,
-      contentState: contentState,
-      currentIndent: currentIndent,
+      editorState,
+      contentState,
+      currentIndent,
     };
   }
 
@@ -240,12 +244,9 @@ const removeIndentFromLine = (
     isBackward: true,
   });
 
-  const newState = modifyEditorState(editorState, contentState, rangeToRemove);
-
   return {
-    editorState: newState.editorState,
-    contentState: newState.contentState,
-    currentIndent: currentIndent,
+    ...modifyEditorState(editorState, contentState, rangeToRemove),
+    currentIndent,
   };
 };
 
@@ -303,3 +304,6 @@ const modifyEditorState = (
     contentState: newContentState,
   };
 };
+
+const forceSelection = ({ editorState, contentState }) =>
+  EditorState.forceSelection(editorState, contentState.getSelectionAfter());

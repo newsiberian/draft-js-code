@@ -21,7 +21,6 @@ const createSelection = (
       .getKey(),
   );
 
-// const tabs = times => '    '.repeat(times || 1);
 const evt = { preventDefault: jest.fn() };
 const initialText = 'hello    hello';
 

@@ -12,11 +12,24 @@ const createWithText = (text: string): Draft.EditorState => {
   return EditorState.createWithContent(contentState);
 };
 
+const createSelection = (
+  currentContent: Draft.ContentState,
+): Draft.SelectionState =>
+  SelectionState.createEmpty(
+    currentContent
+      .getBlockMap()
+      .first()
+      .getKey(),
+  );
+
 const initialText = "return 'hello'; // comment";
 // get default indent here
 const indentLength = getIndentation();
 // modify string with using default indent
-const insertIndentsBeforeText = (modifier, text = initialText) => {
+const insertIndentsBeforeText = (
+  modifier: number,
+  text: string = initialText,
+): string => {
   const indentsLength = indentLength * modifier;
   let textWithIndents = `${text}`;
   for (let i = 0, l = indentsLength; i < l; i++) {
@@ -38,29 +51,27 @@ describe('backspace', () => {
     // .... <-- native (two indents with 2 spaces) for ^^
     //   }
     // };
-    it('should delete all space between indentation and text beginning', () => {
+    // TODO we don't know yet how to let system know is indent should be or not
+    it('should delete all space between indentation and text beginning if indentation should be', () => {
       const textWithOneIndent = insertIndentsBeforeText(1);
-      // add more custom number of spaces to default indent
       const textWithCustomSpaces = `   ${textWithOneIndent}`;
-      const currentContent = ContentState.createFromText(textWithCustomSpaces);
-      const cursorAfterIndent = SelectionState.createEmpty(
-        currentContent
-          .getBlockMap()
-          .first()
-          .getKey(),
-      )
+      const currentContent = ContentState.createFromText(
+        `function () {
+            const x = 'hello';
+            ${textWithCustomSpaces}
+  }`,
+      );
+      // add more custom number of spaces to default indent
+      // const textWithCustomSpaces = `   ${textWithOneIndent}`;
+      // const currentContent = ContentState.createFromText(textWithCustomSpaces);
+      const cursorAfterIndent = createSelection(currentContent)
         .set('anchorOffset', indentLength)
         .set('focusOffset', indentLength);
       // "       return 'hello'; // comment"
       //      ^ cursor should be here if indent === 4
 
       const cursor = detectIndent(textWithCustomSpaces).amount;
-      const cursorBeforeText = SelectionState.createEmpty(
-        currentContent
-          .getBlockMap()
-          .first()
-          .getKey(),
-      )
+      const cursorBeforeText = createSelection(currentContent)
         .set('anchorOffset', cursor)
         .set('focusOffset', cursor);
       // "       return 'hello'; // comment"
@@ -91,12 +102,7 @@ describe('backspace', () => {
       const textWithCustomSpaces = `   ${textWithOneIndent}`;
       const cursor = detectIndent(textWithCustomSpaces).amount;
       const currentContent = ContentState.createFromText(textWithCustomSpaces);
-      const cursorAfterIndent = SelectionState.createEmpty(
-        currentContent
-          .getBlockMap()
-          .first()
-          .getKey(),
-      )
+      const cursorAfterIndent = createSelection(currentContent)
         .set('anchorOffset', cursor)
         .set('focusOffset', cursor);
       // "       return 'hello'; // comment"
@@ -112,11 +118,6 @@ describe('backspace', () => {
       const anchorOffsetAfter = result.getSelection().get('anchorOffset');
       expect(anchorOffsetAfter).toEqual(cursor - 3);
     });
-
-    // it must transfer control above to RichUtils
-    // it('should skip deleting of indentation when cursor at the beginning of text and it\'s match with indentation', () => {
-    //
-    // });
 
     it('should move to previous line if exist, if text begin from the native indent', () => {
       const textWithIndent = insertIndentsBeforeText(1);
@@ -145,15 +146,27 @@ ${textWithIndent}
     });
   });
 
+  // it must transfer control above to RichUtils
+  it('should remove all indentation then cursor at the beginning of text if line is first', () => {
+    const textWithOneIndent = insertIndentsBeforeText(1);
+    const currentContent = ContentState.createFromText(textWithOneIndent);
+    // moving cursor to the beginning of text
+    const cursorAfterIndent = createSelection(currentContent)
+      .set('anchorOffset', getIndentation())
+      .set('focusOffset', getIndentation());
+    const editorState = EditorState.create({
+      currentContent,
+      selection: cursorAfterIndent,
+    });
+
+    const result = handleKeyCommand(editorState, 'backspace');
+    expect(toPlainText(result)).toEqual(initialText);
+  });
+
   it('should skip handling if cursor located after text beginning', () => {
     const textWithIndent = `    ${initialText}`;
     const currentContent = ContentState.createFromText(textWithIndent);
-    const cursorWithinText = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    )
+    const cursorWithinText = createSelection(currentContent)
       .set('anchorOffset', 11)
       .set('focusOffset', 11);
     // "    return 'hello'; // comment"
@@ -168,15 +181,8 @@ ${textWithIndent}
   });
 
   it('should not do anything on backspace if something is selected', () => {
-    const initialText = 'hello';
-
     const currentContent = ContentState.createFromText(initialText);
-    const selectInitialtext = SelectionState.createEmpty(
-      currentContent
-        .getBlockMap()
-        .first()
-        .getKey(),
-    );
+    const selectInitialtext = createSelection(currentContent);
     const editorState = EditorState.create({
       allowUndo: true,
       currentContent,
