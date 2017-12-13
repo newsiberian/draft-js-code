@@ -19,35 +19,50 @@ Demo: [samypesse.github.io/draft-js-code/](http://samypesse.github.io/draft-js-c
 ### Features
 
 - [x] Indent with <kbd>TAB</kbd>
-- [x] Insert new line with correct indentation with <kbd>ENTER</kbd>
-- [x] Remove indentation with <kbd>DELETE</kbd>
-- [ ] Remove indentation with <kdb>SHIFT+TAB</kbd> ([#6](https://github.com/SamyPesse/draft-js-code/issues/6))
-- [ ] Handle input of pair characters like `()`, `[]`, `{}`, `""`, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
+- [ ] Insert new line with correct indentation with <kbd>ENTER</kbd>
+- [ ] Remove indentation with <kbd>DELETE</kbd>
+- [x] Remove indentation from text beginning (if needed) with <kbd>backspace</kbd>
+- [x] Remove indentation with <kdb>SHIFT+TAB</kbd> ([#6](https://github.com/SamyPesse/draft-js-code/issues/6))
+- [x] Remove indentation with <kdb>SHIFT+TAB</kbd> for several lines
+- [x] Handle input of pair characters like `()`, `[]`, `{}`, `""`, `''`, ````, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
 
 ### Installation
 
-```
-$ npm install draft-js-code --save
+```bash
+$ npm install draft-js-code-custom --save
 ```
 
 ### API
 
-##### `CodeUtils.hasSelectionInBlock(editorState)`
+```js
+import  {
+	hasSelectionInBlock,
+	onTab,
+	handleReturn,
+	handleKeyCommand,
+	handleBeforeInput
+} from 'draft-js-code-custom'
+```
+
+##### `hasSelectionInBlock(editorState)`
 
 Returns true if user is editing a code block. You should call this method to encapsulate all other methods when limiting code edition behaviour to `code-block`.
 
-##### `CodeUtils.handleKeyCommand(editorState, command)`
+##### `handleKeyCommand(editorState, command)`
 
-Handle key command for code blocks, returns a new `EditorState` or `null`.
+Handle key command for code blocks, returns a new `EditorState` or `undefined`.
 
-##### `CodeUtils.onTab(e, editorState)`
+##### `onTab(e, editorState)`
 
 Handle user pressing tab, to insert indentation, it returns a new `EditorState`.
 
-##### `CodeUtils.handleReturn(e, editorState)`
+##### `handleReturn(e, editorState)`
 
 Handle user pressing return, to insert a new line inside the code block, it returns a new `EditorState`.
 
+##### `handleBeforeInput(char, editorState)`
+
+Handle inserting pair of special characters, line `()`, `""`, etc. Returns a new `EditorState` or `undefined`.
 
 ### Usage
 
@@ -69,6 +84,16 @@ class Editor extends React.Component {
       editorState
     })
   }
+
+  onBeforeInput = (chars, editorState) => {
+		const newState = handleBeforeInput(chars, editorState);
+
+		if (newState) {
+			this.onChange(newState);
+			return 'handled';
+		}
+		return 'not-handled';
+	};
 
   handleKeyCommand = (command) => {
     const { editorState } = this.state;
@@ -125,6 +150,7 @@ class Editor extends React.Component {
         editorState={this.state.editorState}
         onChange={this.onChange}
         keyBindingFn={this.keyBindingFn}
+        handleBeforeInput={this.onBeforeInput}
         handleKeyCommand={this.handleKeyCommand}
         handleReturn={this.handleReturn}
         onTab={this.onTab}

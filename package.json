@@ -1,6 +1,6 @@
 {
   "name": "draft-js-code-custom",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description":
     "Collection of utilities to make code blocks edition easy in DraftJS",
   "main": "./lib/bundle.umd.js",
@@ -45,9 +45,9 @@
   "author": "Samy Pesse <samypesse@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/SamyPesse/draft-js-code/issues"
+    "url": "https://github.com/newsiberian/draft-js-code/issues"
   },
-  "homepage": "https://github.com/SamyPesse/draft-js-code#readme",
+  "homepage": "https://github.com/newsiberian/draft-js-code#readme",
   "dependencies": {
     "detect-indent": "5.0.0",
     "detect-newline": "^2.1.0",
@@ -89,7 +89,7 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": ["ts", "tsx", "js", "json"]
   }
 }

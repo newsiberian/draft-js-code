@@ -73,12 +73,24 @@ class PrismEditorExample extends React.Component {
     this.onChange = editorState => this.setState({ editorState });
 
     this.handleKeyCommand = command => this._handleKeyCommand(command);
+    this.onBeforeInput = (chars, editorState) =>
+      this._onBeforeInput(chars, editorState);
     this.keyBindingFn = e => this._keyBindingFn(e);
     this.toggleBlockType = type => this._toggleBlockType(type);
     this.toggleInlineStyle = style => this._toggleInlineStyle(style);
     this.onTab = e => this._onTab(e);
     this.onReturn = e => this._onReturn(e);
   }
+
+  _onBeforeInput = (chars, editorState) => {
+    const newState = CodeUtils.handleBeforeInput(chars, editorState);
+
+    if (newState) {
+      this.onChange(newState);
+      return 'handled';
+    }
+    return 'not-handled';
+  };
 
   _handleKeyCommand(command) {
     const { editorState } = this.state;
@@ -178,6 +190,7 @@ class PrismEditorExample extends React.Component {
             customStyleMap={styleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
+            handleBeforeInput={this.onBeforeInput}
             keyBindingFn={this.keyBindingFn}
             onChange={this.onChange}
             placeholder="Tell a story..."

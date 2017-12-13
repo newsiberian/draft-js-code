@@ -3,40 +3,14 @@ import detectIndent from 'detect-indent';
 
 import { handleKeyCommand } from '../handleKeyCommand';
 import { getIndentation } from '../utils/getIndentation';
-
-const toPlainText = (editorState: Draft.EditorState): string =>
-  editorState.getCurrentContent().getPlainText();
-
-const createWithText = (text: string): Draft.EditorState => {
-  const contentState = ContentState.createFromText(text);
-  return EditorState.createWithContent(contentState);
-};
-
-const createSelection = (
-  currentContent: Draft.ContentState,
-): Draft.SelectionState =>
-  SelectionState.createEmpty(
-    currentContent
-      .getBlockMap()
-      .first()
-      .getKey(),
-  );
-
-const initialText = "return 'hello'; // comment";
-// get default indent here
-const indentLength = getIndentation();
-// modify string with using default indent
-const insertIndentsBeforeText = (
-  modifier: number,
-  text: string = initialText,
-): string => {
-  const indentsLength = indentLength * modifier;
-  let textWithIndents = `${text}`;
-  for (let i = 0, l = indentsLength; i < l; i++) {
-    textWithIndents = ` ${textWithIndents}`;
-  }
-  return textWithIndents;
-};
+import {
+  toPlainText,
+  createWithText,
+  createSelection,
+  initialText,
+  indentLength,
+  insertIndentsBeforeText,
+} from './utils';
 
 describe('backspace', () => {
   describe('when cursor at the native indentation depth for current line', () => {
