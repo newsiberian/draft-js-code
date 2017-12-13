@@ -1,4 +1,4 @@
-# draft-js-code-editor
+# draft-js-code-custom
 
 This is a fork of [draft-js-code](https://github.com/SamyPesse/draft-js-code)
 
@@ -8,7 +8,7 @@ It differs from the original package by slanting to work in conditions where eac
 [![NPM version](https://badge.fury.io/js/draft-js-code.svg)](http://badge.fury.io/js/draft-js-code)
 [![Coverage Status](https://coveralls.io/repos/github/SamyPesse/draft-js-code/badge.svg?branch=master)](https://coveralls.io/github/SamyPesse/draft-js-code?branch=master)
 
-`draft-js-code` is a collection of low-level utilities to make code block editing in DraftJS editors nicer.
+`draft-js-code-custom` is a collection of low-level utilities to make code block editing in DraftJS editors nicer.
 
 <!-- If you're using `draft-js-plugins`, check out the [`draft-js-code-plugin`](https://github.com/withspectrum/draft-js-code-plugin) wrapper around this library. -->
 
@@ -36,11 +36,11 @@ $ npm install draft-js-code-custom --save
 
 ```js
 import  {
-	hasSelectionInBlock,
-	onTab,
-	handleReturn,
-	handleKeyCommand,
-	handleBeforeInput
+  hasSelectionInBlock,
+  onTab,
+  handleReturn,
+  handleKeyCommand,
+  handleBeforeInput
 } from 'draft-js-code-custom'
 ```
 
@@ -86,14 +86,14 @@ class Editor extends React.Component {
   }
 
   onBeforeInput = (chars, editorState) => {
-		const newState = handleBeforeInput(chars, editorState);
+    const newState = handleBeforeInput(chars, editorState);
 
-		if (newState) {
-			this.onChange(newState);
-			return 'handled';
-		}
-		return 'not-handled';
-	};
+    if (newState) {
+      this.onChange(newState);
+      return 'handled';
+    }
+    return 'not-handled';
+  };
 
   handleKeyCommand = (command) => {
     const { editorState } = this.state;
@@ -136,10 +136,10 @@ class Editor extends React.Component {
     if (!CodeUtils.hasSelectionInBlock(editorState)) return 'not-handled';
 
     const newState = CodeUtils.onTab(evt, editorState);
-		if (newState) {
-			this.handleChange(newState);
-			return 'handled';
-		}
+    if (newState) {
+      this.onChange(newState);
+      return 'handled';
+    }
 
     return 'not-handled';
   }
