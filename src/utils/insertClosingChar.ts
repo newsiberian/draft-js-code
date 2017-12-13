@@ -1,5 +1,4 @@
 import { EditorState, Modifier } from 'draft-js';
-import * as Draft from 'draft-js';
 
 import { CharSpecs } from './specialChars';
 import { detectNextCharacter, getCursorPosition } from './detectNextCharacter';

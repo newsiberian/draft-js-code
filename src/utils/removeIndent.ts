@@ -1,10 +1,10 @@
 import { EditorState, Modifier } from 'draft-js';
-// import * as detectIndent from 'detect-indent';
 import detectIndent from 'detect-indent';
 
 // import getNewLine from './getNewLine';
 // import { getIndentation } from './getIndentation';
 import { detectIndentation } from './detectIndentation';
+import { getSelectedBlocks } from './getSelectedBlocks';
 
 export interface NewStateInterface {
   editorState: Draft.EditorState;
@@ -54,22 +54,13 @@ export const removeIndent = (
     // we should remove indent from each (if possible)
     const endKey = selection.getEndKey();
     if (endKey !== startKey) {
-      let state = false;
-      let endPassed = false;
       // we need to collect selected lines indents for further selection calibration
       const linesIndents = {};
-      const selectedBlocksRange = contentState
-        .getBlockMap()
-        .filter((value, key) => {
-          if (endPassed) {
-            return false;
-          } else if (key === startKey) {
-            state = true;
-          } else if (key === endKey) {
-            endPassed = true;
-          }
-          return state;
-        });
+      const selectedBlocksRange = getSelectedBlocks(
+        contentState,
+        startKey,
+        endKey,
+      );
 
       selectedBlocksRange.forEach((block, key) => {
         // destructuring with renaming
@@ -97,12 +88,12 @@ export const removeIndent = (
             selection,
             startKey,
             endKey,
-            calibratedAnchorOffset(
+            calibrateOffset(
               selection.get('anchorOffset'),
               linesIndents[startKey],
               indent.length,
             ),
-            calibratedAnchorOffset(
+            calibrateOffset(
               selection.get('focusOffset'),
               linesIndents[endKey],
               indent.length,
@@ -113,12 +104,12 @@ export const removeIndent = (
             selection,
             endKey,
             startKey,
-            calibratedAnchorOffset(
+            calibrateOffset(
               selection.get('anchorOffset'),
               linesIndents[endKey],
               indent.length,
             ),
-            calibratedAnchorOffset(
+            calibrateOffset(
               selection.get('focusOffset'),
               linesIndents[startKey],
               indent.length,
@@ -250,7 +241,11 @@ const removeIndentFromLine = (
   };
 };
 
-const calibratedAnchorOffset = function(offset, lineIndent, indent) {
+const calibrateOffset = (
+  offset: number,
+  lineIndent: number,
+  indent: number,
+): number => {
   if (lineIndent === 0) {
     return offset;
   }
@@ -305,5 +300,5 @@ const modifyEditorState = (
   };
 };
 
-const forceSelection = ({ editorState, contentState }) =>
+const forceSelection = ({ editorState, contentState }): Draft.EditorState =>
   EditorState.forceSelection(editorState, contentState.getSelectionAfter());
