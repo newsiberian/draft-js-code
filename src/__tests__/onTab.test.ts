@@ -1,4 +1,4 @@
-import { EditorState, ContentState } from 'draft-js';
+import { EditorState, ContentBlock, ContentState } from 'draft-js';
 
 import { getIndentation } from '../utils/getIndentation';
 import { onTab } from '../onTab';
@@ -165,9 +165,9 @@ ${insertIndentsBeforeText(2, lineThree)}`,
 });
 
 describe('on Shift+Tab', () => {
-  it('should correctly delete indentation from any cursor position', () => {
-    evt.shiftKey = true;
+  beforeAll(() => (evt.shiftKey = true));
 
+  it('should correctly delete indentation from any cursor position', () => {
     const textWithOneIndent = insertIndentsBeforeText(1);
     const expectedText = initialText;
     const currentContent = ContentState.createFromText(textWithOneIndent);
@@ -228,8 +228,6 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly delete indentation with backward and forward selection', () => {
-    evt.shiftKey = true;
-
     const textWithOneIndent = insertIndentsBeforeText(1);
     const expectedText = initialText;
     const currentContent = ContentState.createFromText(textWithOneIndent);
@@ -261,8 +259,6 @@ describe('on Shift+Tab', () => {
   });
 
   it('should do nothing in any cursor position if no indentation presents', () => {
-    evt.shiftKey = true;
-
     const currentContent = ContentState.createFromText(initialText);
     const selection = createSelection(currentContent);
 
@@ -293,8 +289,6 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly move cursor position after remove indentation', () => {
-    evt.shiftKey = true;
-
     const textWithOneIndent = insertIndentsBeforeText(1);
     const currentContent = ContentState.createFromText(textWithOneIndent);
     const selection = createSelection(currentContent);
@@ -317,8 +311,6 @@ describe('on Shift+Tab', () => {
   });
 
   it('should delete one indentation per keys pressing', () => {
-    evt.shiftKey = true;
-
     const textWithOneIndent = insertIndentsBeforeText(1);
     const textWithTwoIndents = insertIndentsBeforeText(2);
     const currentContent = ContentState.createFromText(textWithTwoIndents);
@@ -336,8 +328,6 @@ describe('on Shift+Tab', () => {
   });
 
   it('should correctly remove indentation for several selected lines', () => {
-    evt.shiftKey = true;
-
     const lineOne = 'function test() {';
     const lineTwo = 'return "This is test";';
     const lineThree = '}';
@@ -368,5 +358,33 @@ ${insertIndentsBeforeText(1, lineThree)}`;
 ${insertIndentsBeforeText(1, lineTwo)}
 ${lineThree}`,
     );
+  });
+
+  it('should skip handling when text beginning from the content-block beginning', () => {
+    const firstBlock = new ContentBlock({
+      key: 'a1',
+      text: 'const a = 1;',
+      type: 'unstyled',
+    });
+    const secondBlock = new ContentBlock({
+      key: 'a2',
+      text: 'function () {',
+      type: 'code-block',
+    });
+    const currentContent = ContentState.createFromBlockArray([
+      firstBlock,
+      secondBlock,
+    ]);
+    const selectSecondBlock = createSelection(currentContent)
+      .set('anchorOffset', 0)
+      .set('focusOffset', 0);
+    const editorState = EditorState.create({
+      allowUndo: true,
+      currentContent,
+      selection: selectSecondBlock,
+    });
+
+    const after = onTab(evt, editorState);
+    expect(toPlainText(after)).toEqual(toPlainText(editorState));
   });
 });

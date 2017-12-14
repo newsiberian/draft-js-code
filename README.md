@@ -14,8 +14,6 @@ It differs from the original package by slanting to work in conditions where eac
 
 It works well with [`draft-js-prism`](https://github.com/SamyPesse/draft-js-prism) or [`draft-js-prism-plugin`](https://github.com/withspectrum/draft-js-prism-plugin).
 
-Demo: [samypesse.github.io/draft-js-code/](http://samypesse.github.io/draft-js-code/)
-
 ### Features
 
 - [x] Indent with <kbd>TAB</kbd>

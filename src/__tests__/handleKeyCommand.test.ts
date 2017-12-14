@@ -1,4 +1,9 @@
-import { EditorState, ContentState, SelectionState } from 'draft-js';
+import {
+  EditorState,
+  ContentBlock,
+  ContentState,
+  SelectionState,
+} from 'draft-js';
 import detectIndent from 'detect-indent';
 
 import { handleKeyCommand } from '../handleKeyCommand';
@@ -165,6 +170,34 @@ ${textWithIndent}
     });
 
     expect(handleKeyCommand(editorState, 'backspace')).toEqual(undefined);
+  });
+
+  it('should skip handling when text beginning from the content-block beginning', () => {
+    const firstBlock = new ContentBlock({
+      key: 'a1',
+      text: 'const a = 1;',
+      type: 'unstyled',
+    });
+    const secondBlock = new ContentBlock({
+      key: 'a2',
+      text: 'function () {',
+      type: 'code-block',
+    });
+    const currentContent = ContentState.createFromBlockArray([
+      firstBlock,
+      secondBlock,
+    ]);
+    const selectSecondBlock = createSelection(currentContent)
+      .set('anchorOffset', 0)
+      .set('focusOffset', 0);
+    const editorState = EditorState.create({
+      allowUndo: true,
+      currentContent,
+      selection: selectSecondBlock,
+    });
+
+    const after = handleKeyCommand(editorState, 'backspace');
+    expect(toPlainText(after)).toEqual(toPlainText(editorState));
   });
 });
 

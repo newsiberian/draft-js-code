@@ -44,6 +44,22 @@ export const removeIndent = (
   const indent = detectIndentation(blockText);
   const currentIndent = detectIndent(blockText).amount;
 
+  // if previous block was not `code-block` and we are at the beginning of line,
+  // we don't do any action to prevent current `code-block` removing
+  if (currentIndent < 1) {
+    const lastBlockBefore = contentState
+      .getBlockMap()
+      .takeUntil((value, key) => key === startKey)
+      .last();
+
+    if (
+      typeof lastBlockBefore === 'undefined' ||
+      lastBlockBefore.getType() !== currentBlock.getType()
+    ) {
+      return editorState;
+    }
+  }
+
   const newState = <NewStateInterface>{
     editorState,
     contentState,
