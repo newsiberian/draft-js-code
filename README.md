@@ -21,11 +21,11 @@ Demo: [samypesse.github.io/draft-js-code/](http://samypesse.github.io/draft-js-c
 - [x] Indent with <kbd>TAB</kbd>
 - [x] Indent with <kbd>TAB</kbd> then several lines selected
 - [ ] Insert new line with correct indentation with <kbd>ENTER</kbd>
-- [ ] Remove indentation with <kbd>DELETE</kbd>
 - [x] Remove indentation from text beginning (if needed) with <kbd>backspace</kbd>
-- [x] Remove indentation with <kdb>SHIFT</kbd>+<kdb>TAB</kbd> ([#6](https://github.com/SamyPesse/draft-js-code/issues/6))
-- [x] Remove indentation with <kdb>SHIFT</kbd>+<kdb>TAB</kbd> for several lines
-- [x] Handle input of pair characters like `()`, `[]`, `{}`, `""`, `''`, ````, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
+- [x] Return from indentation to previous line with <kbd>backspace</kbd> if the context assumes this
+- [x] Remove indentation with <kbd>SHIFT</kbd>+<kbd>TAB</kbd> ([#6](https://github.com/SamyPesse/draft-js-code/issues/6))
+- [x] Remove indentation with <kbd>SHIFT</kbd>+<kbd>TAB</kbd> for several lines
+- [x] Handle input of pair characters like `()`, `[]`, `{}`, `""`, `''`, ` `` `, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
 
 ### Installation
 

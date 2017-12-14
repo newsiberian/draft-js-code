@@ -131,7 +131,37 @@ describe('on Tab', () => {
     );
   });
 
-  it('should correctly indent several selected lines', () => {});
+  it('should correctly indent several selected lines', () => {
+    const lineOne = 'function test() {';
+    const lineTwo = 'return "This is test";';
+    const lineThree = '}';
+    const combinedText = `${insertIndentsBeforeText(1, lineOne)}
+${insertIndentsBeforeText(2, lineTwo)}
+${insertIndentsBeforeText(1, lineThree)}`;
+    const currentContent = ContentState.createFromText(combinedText);
+    const contentBlocks = currentContent.getBlockMap();
+    const firstBlockKey = contentBlocks.first().getKey();
+    const lastBlockKey = contentBlocks.last().getKey();
+    const selection = createSelection(currentContent);
+    const allBlocksSelection = selection.merge({
+      focusKey: lastBlockKey,
+      focusOffset: 3, // random offset
+      anchorKey: firstBlockKey,
+      anchorOffset: 4, // random offset
+    });
+
+    const before = EditorState.create({
+      currentContent,
+      selection: allBlocksSelection,
+    });
+    const after = onTab(evt, before);
+
+    expect(toPlainText(after)).toEqual(
+      `${insertIndentsBeforeText(2, lineOne)}
+${insertIndentsBeforeText(3, lineTwo)}
+${insertIndentsBeforeText(2, lineThree)}`,
+    );
+  });
 });
 
 describe('on Shift+Tab', () => {
