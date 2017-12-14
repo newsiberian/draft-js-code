@@ -46,7 +46,7 @@ export const removeIndent = (
 
   // if previous block was not `code-block` and we are at the beginning of line,
   // we don't do any action to prevent current `code-block` removing
-  if (currentIndent < 1) {
+  if (currentIndent < 1 && startOffset < 1) {
     const lastBlockBefore = contentState
       .getBlockMap()
       .takeUntil((value, key) => key === startKey)
