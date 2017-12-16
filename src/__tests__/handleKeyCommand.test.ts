@@ -30,72 +30,68 @@ describe('backspace', () => {
     // .... <-- native (two indents with 2 spaces) for ^^
     //   }
     // };
-    // TODO we don't know yet how to let system know is indent should be or not
-    it('should delete all space between indentation and text beginning if indentation should be', () => {
-      const textWithOneIndent = insertIndentsBeforeText(1);
-      const textWithCustomSpaces = `   ${textWithOneIndent}`;
-      const currentContent = ContentState.createFromText(
-        `function () {
-            const x = 'hello';
-            ${textWithCustomSpaces}
-  }`,
-      );
-      // add more custom number of spaces to default indent
-      // const textWithCustomSpaces = `   ${textWithOneIndent}`;
-      // const currentContent = ContentState.createFromText(textWithCustomSpaces);
-      const cursorAfterIndent = createSelection(currentContent)
-        .set('anchorOffset', indentLength)
-        .set('focusOffset', indentLength);
-      // "       return 'hello'; // comment"
-      //      ^ cursor should be here if indent === 4
+    it('should remove all spaces between the indent and text beginning, if the indent is supposed', () => {
+      const firstText = 'function () {';
+      const firstBlock = new ContentBlock({
+        key: 'a1',
+        text: firstText,
+        type: 'code-block',
+      });
+      const secondText = "const x = 'hello';";
+      const secondBlock = new ContentBlock({
+        key: 'a2',
+        text: insertIndentsBeforeText(1, secondText),
+        type: 'code-block',
+      });
+      const testedText = 'const str = `this is test`;';
+      const thirdBlock = new ContentBlock({
+        key: 'a3',
+        text: insertIndentsBeforeText(3, testedText),
+        type: 'code-block',
+      });
+      const currentContent = ContentState.createFromBlockArray([
+        firstBlock,
+        secondBlock,
+        thirdBlock,
+      ]);
 
-      const cursor = detectIndent(textWithCustomSpaces).amount;
+      const cursorAfterIndent = createSelection(currentContent)
+        .set('anchorKey', 'a3')
+        .set('anchorOffset', indentLength)
+        .set('focusKey', 'a3')
+        .set('focusOffset', indentLength);
+      // "      const str = `this is test`;"
+      //    ^ cursor should be here if indent === 2
+
+      const cursor = detectIndent(insertIndentsBeforeText(3, testedText))
+        .amount;
       const cursorBeforeText = createSelection(currentContent)
+        .set('anchorKey', 'a3')
         .set('anchorOffset', cursor)
+        .set('focusKey', 'a3')
         .set('focusOffset', cursor);
-      // "       return 'hello'; // comment"
-      //        ^ cursor should be here if indent === 4
+      // "      return 'hello'; // comment"
+      //       ^ cursor should be here
 
       const editorState = EditorState.create({
-        allowUndo: true,
         currentContent,
         selection: cursorAfterIndent,
       });
 
       const result = handleKeyCommand(editorState, 'backspace');
-      expect(toPlainText(result)).toEqual(textWithOneIndent);
+      const currectResult = `${firstText}\n${insertIndentsBeforeText(
+        1,
+        secondText,
+      )}\n${insertIndentsBeforeText(1, testedText)}`;
+      expect(toPlainText(result)).toEqual(currectResult);
 
       const editorStateCaseTwo = EditorState.create({
-        allowUndo: true,
         currentContent,
-        selection: cursorAfterIndent,
+        selection: cursorBeforeText,
       });
 
       const resultTwo = handleKeyCommand(editorStateCaseTwo, 'backspace');
-      expect(toPlainText(resultTwo)).toEqual(textWithOneIndent);
-    });
-
-    it('should move cursor position when deleting spaces between indentation and text beginning', () => {
-      const textWithOneIndent = insertIndentsBeforeText(1);
-      // add more custom number of spaces to default indent
-      const textWithCustomSpaces = `   ${textWithOneIndent}`;
-      const cursor = detectIndent(textWithCustomSpaces).amount;
-      const currentContent = ContentState.createFromText(textWithCustomSpaces);
-      const cursorAfterIndent = createSelection(currentContent)
-        .set('anchorOffset', cursor)
-        .set('focusOffset', cursor);
-      // "       return 'hello'; // comment"
-      //        ^ cursor should be here if indent === 4 + 3 spaces
-
-      const editorState = EditorState.create({
-        allowUndo: true,
-        currentContent,
-        selection: cursorAfterIndent,
-      });
-
-      const result = handleKeyCommand(editorState, 'backspace');
-      const anchorOffsetAfter = result.getSelection().get('anchorOffset');
-      expect(anchorOffsetAfter).toEqual(cursor - 3);
+      expect(toPlainText(resultTwo)).toEqual(currectResult);
     });
 
     it('should move to previous line if exist, if text begin from the native indent', () => {
@@ -123,6 +119,50 @@ ${textWithIndent}
       expect(toPlainText(result)).toEqual(`function () {${initialText}
   }`);
     });
+  });
+
+  it('should move cursor position when deletig spaces between indentation and text beginning', () => {
+    const firstText = 'function () {';
+    const firstBlock = new ContentBlock({
+      key: 'a1',
+      text: firstText,
+      type: 'code-block',
+    });
+    const secondText = "const x = 'hello';";
+    const secondBlock = new ContentBlock({
+      key: 'a2',
+      text: insertIndentsBeforeText(1, secondText),
+      type: 'code-block',
+    });
+    const testedText = 'const str = `this is test`;';
+    const thirdBlock = new ContentBlock({
+      key: 'a3',
+      text: insertIndentsBeforeText(3, testedText),
+      type: 'code-block',
+    });
+    const currentContent = ContentState.createFromBlockArray([
+      firstBlock,
+      secondBlock,
+      thirdBlock,
+    ]);
+    const cursor = detectIndent(insertIndentsBeforeText(3, testedText)).amount;
+    // const currentContent = ContentState.createFromText(textWithCustomSpaces);
+    const cursorAfterIndent = createSelection(currentContent)
+      .set('anchorKey', 'a3')
+      .set('anchorOffset', cursor)
+      .set('focusKey', 'a3')
+      .set('focusOffset', cursor);
+    // "      const str = `this is test`;"
+    //       ^ cursor should be here if indent === 2 * 3
+
+    const editorState = EditorState.create({
+      currentContent,
+      selection: cursorAfterIndent,
+    });
+
+    const result = handleKeyCommand(editorState, 'backspace');
+    const anchorOffsetAfter = result.getSelection().get('anchorOffset');
+    expect(anchorOffsetAfter).toEqual(getIndentation());
   });
 
   // it must transfer control above to RichUtils

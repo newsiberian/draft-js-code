@@ -1,13 +1,10 @@
 const Draft = require('draft-js');
 const React = require('react');
-const Immutable = require('immutable');
 const ReactDOM = require('react-dom');
 const PrismDraftDecorator = require('draft-js-prism');
 const CodeUtils = require('../lib');
 
 const { Editor, EditorState, RichUtils, convertFromRaw } = Draft;
-
-const { Map, List } = Immutable;
 
 class PrismEditorExample extends React.Component {
   constructor(props) {

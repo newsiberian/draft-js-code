@@ -44,14 +44,12 @@
   "pre-commit": "lint-staged",
   "author": "Samy Pesse <samypesse@gmail.com>",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/newsiberian/draft-js-code/issues"
-  },
   "homepage": "https://github.com/newsiberian/draft-js-code#readme",
   "dependencies": {
     "detect-indent": "5.0.0",
     "detect-newline": "^2.1.0",
-    "ends-with": "1.0.1"
+    "ends-with": "1.0.1",
+    "immutable": "~3.7.4"
   },
   "devDependencies": {
     "@types/draft-js": "^0.10.19",
@@ -67,7 +65,6 @@
     "draft-js-prism": "^1.0.2",
     "eslint": "4.13.0",
     "http-server": "0.10.0",
-    "immutable": "3.x",
     "jest": "^21.1.0",
     "lint-staged": "6.0.0",
     "parallelshell": "3.0.2",

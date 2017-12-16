@@ -28,7 +28,6 @@ export const onTab = (
   const selection = editorState.getSelection();
   const startKey = selection.getStartKey();
   const endKey = selection.getEndKey();
-  const currentBlock = contentState.getBlockForKey(startKey);
 
   // handle several lines selection
   if (endKey !== startKey) {
@@ -73,7 +72,7 @@ export const onTab = (
     );
   }
 
-  const indentation = detectIndentation(currentBlock.getText());
+  const indentation = detectIndentation();
 
   const newContentState = selection.isCollapsed()
     ? Modifier.insertText(contentState, selection, indentation)

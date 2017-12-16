@@ -1,17 +1,44 @@
-// import * as detectIndent from 'detect-indent';
+import detectIndent from 'detect-indent';
 import * as Draft from 'draft-js';
+
+import { getIndentation } from './getIndentation';
+import { specialChars } from './specialChars';
 
 /**
  * Detect indentation based on previous line (context)
  * @param {Draft.Model.ImmutableData.ContentBlock} previousBlock
- * @param {string} text
  * @return {string}
  */
 export const detectIndentation = (
-  text?: string,
   previousBlock?: Draft.ContentBlock,
 ): string => {
-  // const result = detectIndent(text);
-  // return result.indent || DEFAULT_INDENTATION;
-  return '  ';
+  // instanceof not always working correctly here
+  if (
+    typeof previousBlock !== 'undefined' &&
+    typeof previousBlock.getText === 'function'
+  ) {
+    const prevBlockText = previousBlock.getText();
+    const prevTextIndent = detectIndent(prevBlockText).indent;
+
+    // if previous text ends with special character, we increase the depth for next
+    // block
+    if (specialChars.has(prevBlockText.charAt(prevBlockText.length - 1))) {
+      // return { indent: numbersToSpaces(indentPerDepth * getIndentation()), depth: prevBlockDepth + 1 };
+      return prevTextIndent + numbersToSpaces(getIndentation());
+    }
+
+    return prevTextIndent;
+  }
+
+  return numbersToSpaces(getIndentation());
+};
+
+const numbersToSpaces = (indent: number): string => buildLine(' ', indent, 1);
+
+const buildLine = (
+  spaces: string,
+  indent: number,
+  currentIndent: number,
+): string => {
+  return currentIndent < indent ? ` ${spaces}` : spaces;
 };
