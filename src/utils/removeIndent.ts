@@ -1,8 +1,11 @@
 import { EditorState, Modifier } from 'draft-js';
 import detectIndent from 'detect-indent';
 
+import * as Immutable from 'immutable';
+
 import { detectIndentation } from './detectIndentation';
 import { getSelectedBlocks } from './getSelectedBlocks';
+import { getIndentation } from './getIndentation';
 
 export interface NewStateInterface {
   editorState: EditorState;
@@ -38,15 +41,21 @@ export const removeIndent = (
   const startOffset = selection.getStartOffset();
   const currentBlock = contentState.getBlockForKey(startKey);
   const blockText = currentBlock.getText();
+  const currentType = currentBlock.getType();
 
-  const currentIndent = detectIndent(blockText).amount;
+  const currentIndent = <number>detectIndent(blockText).amount;
 
-  const lastBlockBefore = <Draft.ContentBlock>contentState
+  const blockMapBefore = contentState
     .getBlockMap()
-    .takeUntil((value, key) => key === startKey)
-    .last();
+    .takeUntil((value, key) => key === startKey);
+
+  const lastBlockBefore = <Draft.ContentBlock>getLastBlockBefore(
+    blockMapBefore,
+    currentType,
+  );
 
   const indent = detectIndentation(lastBlockBefore);
+  const defaultIndent = getIndentation();
 
   // if previous block was not `code-block` and we are at the beginning of line,
   // we don't do any action to prevent current `code-block` removing
@@ -141,15 +150,9 @@ export const removeIndent = (
         return editorState;
       }
 
-      // we need to remove any number of spaces <= indent.length
-      // i.e. if indent is 4, but we have 2 spaces on in the beginning of this line
-      // we removing these 2
-      const indentOffset =
-        currentIndent < indent.length ? currentIndent : indent.length;
-
       const rangeToRemove = <Draft.SelectionState>selection.merge({
         focusKey: startKey,
-        focusOffset: indentOffset,
+        focusOffset: defaultIndent,
         anchorKey: startKey,
         anchorOffset: 0,
         isBackward: false,
@@ -165,8 +168,8 @@ export const removeIndent = (
         selection,
         startKey,
         endKey,
-        selection.get('anchorOffset') - indent.length,
-        selection.get('focusOffset') - indent.length,
+        selection.get('anchorOffset') - defaultIndent,
+        selection.get('focusOffset') - defaultIndent,
       );
 
       return forceSelection(modifiedSingleLineState);
@@ -219,6 +222,16 @@ export const removeIndent = (
     return forceSelection(
       modifyEditorState(editorState, contentState, rangeToRemove),
     );
+  }
+};
+
+const getLastBlockBefore = (
+  blockMap: Immutable.OrderedMap<string, Draft.ContentBlock>,
+  currentType: string,
+): Draft.ContentBlock | void => {
+  const last = blockMap.last();
+  if (typeof last !== 'undefined' && last.getType() === currentType) {
+    return blockMap.last();
   }
 };
 

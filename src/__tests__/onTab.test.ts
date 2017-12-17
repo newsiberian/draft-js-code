@@ -376,7 +376,9 @@ ${lineThree}`,
       secondBlock,
     ]);
     const selectSecondBlock = createSelection(currentContent)
+      .set('anchorKey', 'a2')
       .set('anchorOffset', 0)
+      .set('focusKey', 'a2')
       .set('focusOffset', 0);
     const editorState = EditorState.create({
       allowUndo: true,
@@ -386,5 +388,71 @@ ${lineThree}`,
 
     const after = onTab(evt, editorState);
     expect(toPlainText(after)).toEqual(toPlainText(editorState));
+  });
+
+  it('should skip using as `lastBlockBefore` block of the another type than current', () => {
+    const firstText = 'const a = 1;';
+    const firstBlock = new ContentBlock({
+      key: 'a1',
+      text: firstText,
+      type: 'unstyled',
+    });
+    const secondText = 'function () {';
+    const secondBlock = new ContentBlock({
+      key: 'a2',
+      text: insertIndentsBeforeText(2, secondText),
+      type: 'code-block',
+    });
+    const currentContent = ContentState.createFromBlockArray([
+      firstBlock,
+      secondBlock,
+    ]);
+    const selectSecondBlock = createSelection(currentContent)
+      .set('anchorKey', 'a2')
+      .set('anchorOffset', getIndentation() * 2)
+      .set('focusKey', 'a2')
+      .set('focusOffset', getIndentation() * 2);
+    const editorState = EditorState.create({
+      currentContent,
+      selection: selectSecondBlock,
+    });
+
+    const after = onTab(evt, editorState);
+    expect(toPlainText(after)).toEqual(
+      `${firstText}\n${insertIndentsBeforeText(1, secondText)}`,
+    );
+  });
+
+  it('should remove indent if previous block of the same type has no indent', () => {
+    const firstText = 'const a = 1;';
+    const firstBlock = new ContentBlock({
+      key: 'a1',
+      text: firstText,
+      type: 'code-block',
+    });
+    const secondText = 'function () {';
+    const secondBlock = new ContentBlock({
+      key: 'a2',
+      text: insertIndentsBeforeText(2, secondText),
+      type: 'code-block',
+    });
+    const currentContent = ContentState.createFromBlockArray([
+      firstBlock,
+      secondBlock,
+    ]);
+    const selectSecondBlock = createSelection(currentContent)
+      .set('anchorKey', 'a2')
+      .set('anchorOffset', getIndentation() * 2)
+      .set('focusKey', 'a2')
+      .set('focusOffset', getIndentation() * 2);
+    const editorState = EditorState.create({
+      currentContent,
+      selection: selectSecondBlock,
+    });
+
+    const after = onTab(evt, editorState);
+    expect(toPlainText(after)).toEqual(
+      `${firstText}\n${insertIndentsBeforeText(1, secondText)}`,
+    );
   });
 });

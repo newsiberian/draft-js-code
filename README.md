@@ -24,7 +24,7 @@ It works well with [`draft-js-prism`](https://github.com/SamyPesse/draft-js-pris
 - [x] Remove indentation with <kbd>SHIFT</kbd>+<kbd>TAB</kbd> ([#6](https://github.com/SamyPesse/draft-js-code/issues/6))
 - [x] Remove indentation with <kbd>SHIFT</kbd>+<kbd>TAB</kbd> for several lines
 - [x] Handle input of pair characters like `()`, `[]`, `{}`, `""`, `''`, ` `` `, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
-- [ ] Implement code block depth based on pair characters
+- [x] Implement code block depth based on pair characters
 
 ### Installation
 
