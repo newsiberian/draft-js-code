@@ -10,7 +10,9 @@ class PrismEditorExample extends React.Component {
   constructor(props) {
     super(props);
 
-    var decorator = new PrismDraftDecorator();
+    var decorator = new PrismDraftDecorator({
+      defaultSyntax: 'javascript',
+    });
     var contentState = convertFromRaw({
       entityMap: {},
       blocks: [
