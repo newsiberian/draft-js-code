@@ -23,7 +23,6 @@ export const detectIndentation = (
     // if previous text ends with special character, we increase the depth for next
     // block
     if (specialChars.has(prevBlockText.charAt(prevBlockText.length - 1))) {
-      // return { indent: numbersToSpaces(indentPerDepth * getIndentation()), depth: prevBlockDepth + 1 };
       return prevTextIndent + numbersToSpaces(getIndentation());
     }
 

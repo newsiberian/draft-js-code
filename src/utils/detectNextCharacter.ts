@@ -1,5 +1,7 @@
 import * as Draft from 'draft-js';
 
+import { blockClosingChars } from './specialChars';
+
 export interface CursorPositionInterface {
   key: string;
   offset: number;
@@ -19,7 +21,14 @@ export const detectNextCharacter = (
   const blockWithCursor = contentState.getBlockForKey(cursorPosition.key);
   const nextChar = blockWithCursor.getText().substr(cursorPosition.offset, 1);
 
-  return Boolean(nextChar.length) && !/\s|\t|\n|\f|\r|\v/.test(nextChar);
+  // return true if next character is space-like or one of the block-closing ],},)
+  return (
+    Boolean(nextChar.length) &&
+    !(
+      blockClosingChars.indexOf(nextChar) !== -1 ||
+      /\s|\t|\n|\f|\r|\v/.test(nextChar)
+    )
+  );
 };
 
 export const getCursorPosition = (

@@ -1,6 +1,6 @@
 import { EditorState } from 'draft-js';
 
-import { buildMapWithNewBlock } from './buildMapWithNewBlock';
+import { buildBlockMap } from './buildBlockMap';
 
 /**
  *  Insert a new line with right indent
@@ -12,68 +12,39 @@ export const insertNewLine = (editorState: EditorState): EditorState => {
   const contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
   const startKey = selection.getStartKey();
-  // const startOffset = selection.getStartOffset();
   const currentBlock = contentState.getBlockForKey(startKey);
-  // const blockText = currentBlock.getText();
-
-  // Detect newline separation
-  // var newLine = getNewLine(blockText);
-
-  // const currentBlockLengthBefore = currentBlock.getLength();
-
-  // const modifiedCurrentBlock = currentBlock.setIn(['text'], `${blockText}    `);
-
   const blockMap = contentState.getBlockMap();
-  const compareBlocks = contentBlock => contentBlock === currentBlock;
+
+  const compareBlocks = (contentBlock: Draft.ContentBlock): boolean =>
+    contentBlock === currentBlock;
+
   const blocksBefore = blockMap.toSeq().takeUntil(compareBlocks);
   const blocksAfter = blockMap
     .toSeq()
     .skipUntil(compareBlocks)
     .rest();
 
-  const blockMapWithNewBlock = buildMapWithNewBlock(contentState, currentBlock);
-  const newContentBlock = blockMapWithNewBlock.last();
+  const { newBlockMap, selectionKey, selectionOffset } = buildBlockMap(
+    contentState,
+    currentBlock,
+    selection.getAnchorOffset(),
+  );
 
   // Join back together with the current + new block
-  const newBlockMap = blocksBefore
-    .concat(blockMapWithNewBlock.toSeq(), blocksAfter)
+  const blockMap = blocksBefore
+    .concat(newBlockMap.toSeq(), blocksAfter)
     .toOrderedMap();
 
   const modifiedContentState = <Draft.ContentState>contentState.merge({
-    blockMap: newBlockMap,
+    blockMap,
     selectionBefore: selection,
     selectionAfter: selection.merge({
-      anchorKey: newContentBlock.getKey(),
-      anchorOffset: newContentBlock.getLength(),
-      focusKey: newContentBlock.getKey(),
-      focusOffset: newContentBlock.getLength(),
+      anchorKey: selectionKey,
+      anchorOffset: selectionOffset,
+      focusKey: selectionKey,
+      focusOffset: selectionOffset,
     }),
   });
-
-  // const contentStateWithSplittedBlock = Modifier.splitBlock(contentState, selection.merge({
-  //   anchorKey: currentBlock.getKey(),
-  //   anchorOffset: currentBlock.getLength(),
-  //   focusKey: currentBlock.getKey(),
-  //   focusOffset: currentBlock.getLength(),
-  // }));
-  //
-  //
-  //
-  // // select all current block to replace it
-  // const targetRange = selection.merge({
-  //   anchorKey: currentBlock.getKey(),
-  //   anchorOffset: 0,
-  //   focusKey: currentBlock.getKey(),
-  //   focusOffset: currentBlock.getText().length,
-  //   isBackward: false
-  // });
-
-  // Add or replace
-  // if (selection.isCollapsed()) {
-  //
-  // } else {
-  //
-  // }
 
   return EditorState.push(editorState, modifiedContentState, 'insert-fragment');
 };

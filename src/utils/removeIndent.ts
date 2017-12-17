@@ -1,13 +1,11 @@
 import { EditorState, Modifier } from 'draft-js';
 import detectIndent from 'detect-indent';
 
-// import getNewLine from './getNewLine';
-// import { getIndentation } from './getIndentation';
 import { detectIndentation } from './detectIndentation';
 import { getSelectedBlocks } from './getSelectedBlocks';
 
 export interface NewStateInterface {
-  editorState: Draft.EditorState;
+  editorState: EditorState;
   contentState: Draft.ContentState;
   currentIndent?: number;
 }
@@ -25,9 +23,9 @@ interface TargetInterface {
  * @return {Draft.EditorState|Undefined}
  */
 export const removeIndent = (
-  editorState: Draft.EditorState,
+  editorState: EditorState,
   isShiftTab: boolean,
-): Draft.EditorState | void => {
+): EditorState | void => {
   const contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
 
@@ -225,7 +223,7 @@ export const removeIndent = (
 };
 
 const removeIndentFromLine = (
-  editorState: Draft.EditorState,
+  editorState: EditorState,
   contentState: Draft.ContentState,
   selection: Draft.SelectionState,
   block: Draft.ContentBlock,
@@ -296,7 +294,7 @@ const calibrateCursor = (
 };
 
 const modifyEditorState = (
-  editorState: Draft.EditorState,
+  editorState: EditorState,
   contentState: Draft.ContentState,
   rangeToRemove: Draft.SelectionState,
 ): NewStateInterface => {
@@ -317,5 +315,5 @@ const modifyEditorState = (
   };
 };
 
-const forceSelection = ({ editorState, contentState }): Draft.EditorState =>
+const forceSelection = ({ editorState, contentState }): EditorState =>
   EditorState.forceSelection(editorState, contentState.getSelectionAfter());

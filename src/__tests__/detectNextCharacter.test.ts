@@ -19,6 +19,12 @@ describe('detectNextCharacter', () => {
 
     const forwardResult = detectNextCharacter(currentContent, forwardSelection);
     expect(forwardResult).toBeTruthy();
+
+    const backwardResult = detectNextCharacter(
+      currentContent,
+      backwardSelection,
+    );
+    expect(backwardResult).toBeFalsy();
   });
 
   it('should correctly detect spaces, tabs, etc characters', () => {
@@ -48,5 +54,17 @@ describe('detectNextCharacter', () => {
       );
       expect(resultWithSpaces).toBeFalsy();
     });
+  });
+
+  it('should allow insert pair of special character between block characters', () => {
+    const text = 'aaa[]bbb';
+    const currentContent = ContentState.createFromText(text);
+    const forwardSelection = createSelection(currentContent)
+      .set('anchorOffset', 4)
+      .set('focusOffset', 4);
+
+    const forwardResult = detectNextCharacter(currentContent, forwardSelection);
+    // ] is not recognized as a character (this is expected)
+    expect(forwardResult).toBeFalsy();
   });
 });
