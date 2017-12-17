@@ -2,7 +2,7 @@ import detectIndent from 'detect-indent';
 import * as Draft from 'draft-js';
 
 import { getIndentation } from './getIndentation';
-import { specialChars } from './specialChars';
+import { blockChars } from './specialChars';
 
 /**
  * Detect indentation based on previous line (context)
@@ -22,7 +22,7 @@ export const detectIndentation = (
 
     // if previous text ends with special character, we increase the depth for next
     // block
-    if (specialChars.has(prevBlockText.charAt(prevBlockText.length - 1))) {
+    if (blockChars.has(prevBlockText.charAt(prevBlockText.length - 1))) {
       return prevTextIndent + numbersToSpaces(getIndentation());
     }
 

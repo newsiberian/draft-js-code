@@ -76,7 +76,7 @@ class PrismEditorExample extends React.Component {
     this.toggleBlockType = type => this._toggleBlockType(type);
     this.toggleInlineStyle = style => this._toggleInlineStyle(style);
     this.onTab = e => this._onTab(e);
-    this.onReturn = e => this._onReturn(e);
+    this.onReturn = (e, editorState) => this._onReturn(e, editorState);
   }
 
   _onBeforeInput(chars, editorState) {
@@ -103,9 +103,9 @@ class PrismEditorExample extends React.Component {
 
     if (newState) {
       this.onChange(newState);
-      return true;
+      return 'handled';
     }
-    return false;
+    return 'not-handled';
   }
 
   _keyBindingFn(e) {
@@ -142,15 +142,13 @@ class PrismEditorExample extends React.Component {
     this.onChange(CodeUtils.onTab(e, editorState));
   }
 
-  _onReturn(e) {
-    let editorState = this.state.editorState;
-
-    if (!CodeUtils.hasSelectionInBlock(editorState)) {
-      return;
+  _onReturn(e, editorState) {
+    if (CodeUtils.hasSelectionInBlock(editorState)) {
+      this.onChange(CodeUtils.handleReturn(e, editorState));
+      return 'handled';
     }
 
-    this.onChange(CodeUtils.handleReturn(e, editorState));
-    return true;
+    return 'not-handled';
   }
 
   render() {
