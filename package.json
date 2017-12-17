@@ -47,8 +47,6 @@
   "homepage": "https://github.com/newsiberian/draft-js-code#readme",
   "dependencies": {
     "detect-indent": "5.0.0",
-    "detect-newline": "^2.1.0",
-    "ends-with": "1.0.1",
     "immutable": "~3.7.4"
   },
   "devDependencies": {

@@ -79,7 +79,7 @@ class PrismEditorExample extends React.Component {
     this.onReturn = e => this._onReturn(e);
   }
 
-  _onBeforeInput = (chars, editorState) => {
+  _onBeforeInput(chars, editorState) {
     const newState = CodeUtils.handleBeforeInput(chars, editorState);
 
     if (newState) {
@@ -87,7 +87,7 @@ class PrismEditorExample extends React.Component {
       return 'handled';
     }
     return 'not-handled';
-  };
+  }
 
   _handleKeyCommand(command) {
     const { editorState } = this.state;

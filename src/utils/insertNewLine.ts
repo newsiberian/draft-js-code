@@ -31,12 +31,12 @@ export const insertNewLine = (editorState: EditorState): EditorState => {
   );
 
   // Join back together with the current + new block
-  const blockMap = blocksBefore
+  const mergedBlockMap = blocksBefore
     .concat(newBlockMap.toSeq(), blocksAfter)
     .toOrderedMap();
 
   const modifiedContentState = <Draft.ContentState>contentState.merge({
-    blockMap,
+    blockMap: mergedBlockMap,
     selectionBefore: selection,
     selectionAfter: selection.merge({
       anchorKey: selectionKey,
