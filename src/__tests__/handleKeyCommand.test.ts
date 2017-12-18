@@ -16,6 +16,10 @@ import {
   insertIndentsBeforeText,
 } from './utils';
 
+jest.mock('../utils/moveSelectionToStartOfText', () => {
+  return jest.fn(() => 'moveSelectionToStartOfText called');
+});
+
 describe('backspace', () => {
   describe('when cursor at the native indentation depth for current line', () => {
     //
@@ -237,6 +241,21 @@ ${textWithIndent}
 
     const after = handleKeyCommand(editorState, 'backspace');
     expect(toPlainText(after)).toEqual(toPlainText(editorState));
+  });
+});
+
+describe('move-selection-to-start-of-text', () => {
+  afterAll(() => {
+    jest.unmock('../utils/moveSelectionToStartOfText');
+  });
+
+  it('should call moveSelectionToStartOfText', () => {
+    const editorState = createWithText('');
+    const result = handleKeyCommand(
+      editorState,
+      'move-selection-to-start-of-text',
+    );
+    expect(result).toBe('moveSelectionToStartOfText called');
   });
 });
 

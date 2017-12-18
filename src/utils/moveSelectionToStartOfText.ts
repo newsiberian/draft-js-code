@@ -7,7 +7,8 @@ import detectIndent from 'detect-indent';
  * @param {Draft.Model.ImmutableData.EditorState} editorState
  * @return {Draft.Model.ImmutableData.EditorState}
  */
-export const moveSelectionToStartOfText = (
+export default (
+  // export default for easier mocking
   editorState: EditorState,
 ): EditorState => {
   const contentState = editorState.getCurrentContent();

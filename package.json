@@ -82,6 +82,7 @@
     "draft-js": "0.x"
   },
   "jest": {
+    "mapCoverage": true,
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },

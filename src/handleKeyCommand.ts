@@ -1,6 +1,6 @@
 import * as Draft from 'draft-js';
 
-import { moveSelectionToStartOfText } from './utils/moveSelectionToStartOfText';
+import moveSelectionToStartOfText from './utils/moveSelectionToStartOfText';
 import { removeIndent } from './utils/removeIndent';
 
 type DraftCodeEditorCommand =

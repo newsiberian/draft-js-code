@@ -13,7 +13,8 @@ describe('detectNextCharacter', () => {
     //       ^ <-- cursor here
     const backwardSelection = createSelection(currentContent)
       .set('anchorOffset', 16)
-      .set('focusOffset', 15);
+      .set('focusOffset', 15)
+      .set('isBackward', true);
     // return 'hello'; // comment
     //                ^ <-- cursor here
 
@@ -24,7 +25,7 @@ describe('detectNextCharacter', () => {
       currentContent,
       backwardSelection,
     );
-    expect(backwardResult).toBeFalsy();
+    expect(backwardResult).toBeTruthy();
   });
 
   it('should correctly detect spaces, tabs, etc characters', () => {

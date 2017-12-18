@@ -1,7 +1,7 @@
 import { EditorState, ContentState } from 'draft-js';
 import detectIndent from 'detect-indent';
 
-import { moveSelectionToStartOfText } from '../utils/moveSelectionToStartOfText';
+import moveSelectionToStartOfText from '../utils/moveSelectionToStartOfText';
 import {
   createWithText,
   createSelection,

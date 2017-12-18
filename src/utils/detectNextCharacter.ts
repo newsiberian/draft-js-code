@@ -11,7 +11,7 @@ export interface CursorPositionInterface {
  * Detect if there is any character exist after special character
  * @param {Draft.Model.ImmutableData.ContentState} contentState
  * @param {Draft.Model.ImmutableData.SelectionState} selection
- * @return {boolean}
+ * @return {boolean} true if next char 'exist'
  */
 export const detectNextCharacter = (
   contentState: Draft.ContentState,
@@ -21,7 +21,7 @@ export const detectNextCharacter = (
   const blockWithCursor = contentState.getBlockForKey(cursorPosition.key);
   const nextChar = blockWithCursor.getText().substr(cursorPosition.offset, 1);
 
-  // return true if next character is space-like or one of the block-closing ],},)
+  // return false if next character is space-like or one of the block-closing ],},)
   return (
     Boolean(nextChar.length) &&
     !(
