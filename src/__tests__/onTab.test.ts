@@ -98,7 +98,8 @@ describe('on Tab', () => {
 
     const backwardSelection = createSelection(currentContent)
       .set('anchorOffset', 3)
-      .set('focusOffset', 1);
+      .set('focusOffset', 1)
+      .set('isBackward', true);
 
     const backwardOneBefore = EditorState.create({
       allowUndo: true,
@@ -234,7 +235,8 @@ describe('on Shift+Tab', () => {
 
     const backwardSelection = selection
       .set('anchorOffset', 7)
-      .set('focusOffset', 5);
+      .set('focusOffset', 5)
+      .set('isBackward', true);
 
     const forwardSelection = selection
       .set('anchorOffset', 5)

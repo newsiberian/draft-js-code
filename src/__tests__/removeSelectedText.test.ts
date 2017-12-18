@@ -43,6 +43,28 @@ it('should remove selected text', () => {
       FOCUS_OFFSET,
     )}`,
   );
+
+  const backwardSelection = createSelection(currentContent)
+    .set('anchorKey', 'a2')
+    .set('anchorOffset', ANCHOR_OFFSET)
+    .set('focusKey', 'a1')
+    .set('focusOffset', FOCUS_OFFSET)
+    .set('isBackward', true);
+  // '1 2 3 4 5'
+  //     ^ offset here
+  // '6 7 8 9 0'
+  //       ^ anchor here
+  const editorStateCaseTwo = EditorState.create({
+    currentContent,
+    selection: backwardSelection,
+  });
+
+  const secondResult = removeSelectedText(editorStateCaseTwo);
+  expect(toPlainText(secondResult)).toEqual(
+    `${firstText.substring(0, FOCUS_OFFSET)}\n${secondText.substring(
+      ANCHOR_OFFSET,
+    )}`,
+  );
 });
 
 it('should move cursor to the selection end (right side of the selection)', () => {

@@ -40,7 +40,6 @@ describe('handleBeforeInput', () => {
   });
 
   it('should move cursor between pair characters', () => {
-    const text = "return 'hello'; // comment";
     const currentContent = ContentState.createFromText(initialText);
     const forwardSelection = createSelection(currentContent)
       .set('anchorOffset', 15)
@@ -84,5 +83,21 @@ describe('handleBeforeInput', () => {
         `${partOne}${charStats.pair}${partTwo}`,
       );
     });
+  });
+
+  it('should do nothing if char does not recognized', () => {
+    const currentContent = ContentState.createFromText(initialText);
+    const forwardSelection = createSelection(currentContent)
+      .set('anchorOffset', 16)
+      .set('focusOffset', 16);
+    // return 'hello'; // comment
+    //                ^ <-- cursor here
+
+    const editorState = EditorState.create({
+      currentContent,
+      selection: forwardSelection,
+    });
+
+    expect(handleBeforeInput('a', editorState)).toBeUndefined();
   });
 });
