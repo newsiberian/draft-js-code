@@ -1,6 +1,5 @@
 import { EditorState, ContentBlock, ContentState } from 'draft-js';
 
-import { getIndentation } from '../utils/getIndentation';
 import { onTab } from '../onTab';
 import {
   toPlainText,
@@ -78,11 +77,11 @@ describe('on Tab', () => {
     const selectionAfterFirstforwardMove = forwardOneAfter.getSelection();
     expect(selectionAfterFirstforwardMove.toJS()).toHaveProperty(
       'anchorOffset',
-      1 + getIndentation(),
+      1 + indentLength,
     );
     expect(selectionAfterFirstforwardMove.toJS()).toHaveProperty(
       'focusOffset',
-      3 + getIndentation(),
+      3 + indentLength,
     );
 
     // second iteration
@@ -90,11 +89,11 @@ describe('on Tab', () => {
     const selectionAfterSecondforwardMove = forwardTwoBefore.getSelection();
     expect(selectionAfterSecondforwardMove.toJS()).toHaveProperty(
       'anchorOffset',
-      1 + getIndentation() * 2,
+      1 + indentLength * 2,
     );
     expect(selectionAfterSecondforwardMove.toJS()).toHaveProperty(
       'focusOffset',
-      3 + getIndentation() * 2,
+      3 + indentLength * 2,
     );
 
     const backwardSelection = createSelection(currentContent)
@@ -111,11 +110,11 @@ describe('on Tab', () => {
     const selectionAfterFirstBackwardMove = backwardOneAfter.getSelection();
     expect(selectionAfterFirstBackwardMove.toJS()).toHaveProperty(
       'anchorOffset',
-      3 + getIndentation(),
+      3 + indentLength,
     );
     expect(selectionAfterFirstBackwardMove.toJS()).toHaveProperty(
       'focusOffset',
-      1 + getIndentation(),
+      1 + indentLength,
     );
 
     // second iteration
@@ -123,11 +122,11 @@ describe('on Tab', () => {
     const selectionAfterSecondBackwardMove = backwardTwoBefore.getSelection();
     expect(selectionAfterSecondBackwardMove.toJS()).toHaveProperty(
       'anchorOffset',
-      3 + getIndentation() * 2,
+      3 + indentLength * 2,
     );
     expect(selectionAfterSecondBackwardMove.toJS()).toHaveProperty(
       'focusOffset',
-      1 + getIndentation() * 2,
+      1 + indentLength * 2,
     );
   });
 
@@ -409,9 +408,9 @@ ${lineThree}`,
     ]);
     const selectSecondBlock = createSelection(currentContent)
       .set('anchorKey', 'a2')
-      .set('anchorOffset', getIndentation() * 2)
+      .set('anchorOffset', indentLength * 2)
       .set('focusKey', 'a2')
-      .set('focusOffset', getIndentation() * 2);
+      .set('focusOffset', indentLength * 2);
     const editorState = EditorState.create({
       currentContent,
       selection: selectSecondBlock,
@@ -442,9 +441,9 @@ ${lineThree}`,
     ]);
     const selectSecondBlock = createSelection(currentContent)
       .set('anchorKey', 'a2')
-      .set('anchorOffset', getIndentation() * 2)
+      .set('anchorOffset', indentLength * 2)
       .set('focusKey', 'a2')
-      .set('focusOffset', getIndentation() * 2);
+      .set('focusOffset', indentLength * 2);
     const editorState = EditorState.create({
       currentContent,
       selection: selectSecondBlock,

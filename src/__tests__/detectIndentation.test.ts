@@ -1,8 +1,7 @@
 import { ContentState } from 'draft-js';
 
 import { detectIndentation } from '../utils/detectIndentation';
-import { getIndentation } from '../utils/getIndentation';
-import { insertIndentsBeforeText } from './utils';
+import { indentLength, insertIndentsBeforeText } from './utils';
 
 it('should return indent based on previous block indent', () => {
   const MULTIPLIER = 2;
@@ -11,7 +10,7 @@ it('should return indent based on previous block indent', () => {
   const currentBlock = currentContent.getBlockMap().last();
 
   const result = detectIndentation(currentBlock);
-  expect(result.length).toBe(getIndentation() * MULTIPLIER);
+  expect(result.length).toBe(indentLength * MULTIPLIER);
 });
 
 it('should not allow accept something other than ContentBlock', () => {
@@ -22,9 +21,9 @@ it('should not allow accept something other than ContentBlock', () => {
   });
 
   // it should behave as if he had not been given an argument
-  expect(result.length).toBe(getIndentation());
+  expect(result.length).toBe(indentLength);
 });
 
 it('should return default indent if no previous block was passed', () => {
-  expect(detectIndentation().length).toBe(getIndentation());
+  expect(detectIndentation().length).toBe(indentLength);
 });

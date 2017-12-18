@@ -7,7 +7,6 @@ import {
 import detectIndent from 'detect-indent';
 
 import { handleKeyCommand } from '../handleKeyCommand';
-import { getIndentation } from '../utils/getIndentation';
 import {
   toPlainText,
   createWithText,
@@ -162,7 +161,7 @@ ${textWithIndent}
 
     const result = handleKeyCommand(editorState, 'backspace');
     const anchorOffsetAfter = result.getSelection().get('anchorOffset');
-    expect(anchorOffsetAfter).toEqual(getIndentation());
+    expect(anchorOffsetAfter).toEqual(indentLength);
   });
 
   // it must transfer control above to RichUtils
@@ -171,8 +170,8 @@ ${textWithIndent}
     const currentContent = ContentState.createFromText(textWithOneIndent);
     // moving cursor to the beginning of text
     const cursorAfterIndent = createSelection(currentContent)
-      .set('anchorOffset', getIndentation())
-      .set('focusOffset', getIndentation());
+      .set('anchorOffset', indentLength)
+      .set('focusOffset', indentLength);
     const editorState = EditorState.create({
       currentContent,
       selection: cursorAfterIndent,

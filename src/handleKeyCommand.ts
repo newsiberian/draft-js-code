@@ -1,6 +1,11 @@
+import * as Draft from 'draft-js';
+
+import { moveSelectionToStartOfText } from './utils/moveSelectionToStartOfText';
 import { removeIndent } from './utils/removeIndent';
 
-import * as Draft from 'draft-js';
+type DraftCodeEditorCommand =
+  | Draft.DraftEditorCommand
+  | 'move-selection-to-start-of-text';
 
 /**
  * Handle key command for code blocks
@@ -10,9 +15,15 @@ import * as Draft from 'draft-js';
  */
 export const handleKeyCommand = (
   editorState: Draft.EditorState,
-  command: Draft.DraftEditorCommand,
+  command: DraftCodeEditorCommand,
 ): Draft.EditorState | void => {
-  if (command === 'backspace') {
-    return removeIndent(editorState, false);
+  switch (command) {
+    case 'backspace':
+      // here undefined could be returned
+      return removeIndent(editorState, false);
+    case 'move-selection-to-start-of-text':
+      return moveSelectionToStartOfText(editorState);
+    default:
+      return undefined;
   }
 };
