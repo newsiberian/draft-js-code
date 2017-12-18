@@ -269,12 +269,13 @@ const removeIndentFromLine = (
   };
 };
 
-const calibrateOffset = (
+// export only for testing
+export const calibrateOffset = (
   offset: number,
   lineIndent: number,
   indent: number,
 ): number => {
-  if (lineIndent === 0) {
+  if (lineIndent < 1) {
     return offset;
   }
 
