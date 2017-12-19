@@ -1,6 +1,7 @@
 import { EditorState } from 'draft-js';
 
 import { buildBlockMap } from './buildBlockMap';
+import { mergeBlockMap } from './mergeBlockMap';
 
 /**
  *  Insert a new line with right indent
@@ -13,16 +14,6 @@ export const insertNewLine = (editorState: EditorState): EditorState => {
   const selection = editorState.getSelection();
   const startKey = selection.getStartKey();
   const currentBlock = contentState.getBlockForKey(startKey);
-  const blockMap = contentState.getBlockMap();
-
-  const compareBlocks = (contentBlock: Draft.ContentBlock): boolean =>
-    contentBlock === currentBlock;
-
-  const blocksBefore = blockMap.toSeq().takeUntil(compareBlocks);
-  const blocksAfter = blockMap
-    .toSeq()
-    .skipUntil(compareBlocks)
-    .rest();
 
   const { newBlockMap, selectionKey, selectionOffset } = buildBlockMap(
     contentState,
@@ -30,12 +21,9 @@ export const insertNewLine = (editorState: EditorState): EditorState => {
     selection.getAnchorOffset(),
   );
 
-  // Join back together with the current + new block
-  const mergedBlockMap = blocksBefore
-    .concat(newBlockMap.toSeq(), blocksAfter)
-    .toOrderedMap();
+  const mergedBlockMap = mergeBlockMap(contentState, currentBlock, newBlockMap);
 
-  const modifiedContentState = <Draft.ContentState>contentState.merge({
+  const modifiedContent = <Draft.ContentState>contentState.merge({
     blockMap: mergedBlockMap,
     selectionBefore: selection,
     selectionAfter: selection.merge({
@@ -46,5 +34,5 @@ export const insertNewLine = (editorState: EditorState): EditorState => {
     }),
   });
 
-  return EditorState.push(editorState, modifiedContentState, 'insert-fragment');
+  return EditorState.push(editorState, modifiedContent, 'insert-fragment');
 };

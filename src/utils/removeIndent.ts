@@ -98,7 +98,6 @@ export const removeIndent = (
           selection,
           block,
           key,
-          indent,
         );
         linesIndents[key] = newCurrentIndent;
         newState.editorState = newEditorState;
@@ -241,7 +240,6 @@ const removeIndentFromLine = (
   selection: Draft.SelectionState,
   block: Draft.ContentBlock,
   blockKey: string,
-  indent: string,
 ): NewStateInterface => {
   const text = block.getText();
   const currentIndent = detectIndent(text).amount;
@@ -254,10 +252,10 @@ const removeIndentFromLine = (
     };
   }
 
+  const indent = getIndentation();
   const rangeToRemove = <Draft.SelectionState>selection.merge({
     focusKey: blockKey,
-    focusOffset:
-      currentIndent >= indent.length ? currentIndent - indent.length : 0,
+    focusOffset: currentIndent >= indent ? currentIndent - indent : 0,
     anchorKey: blockKey,
     anchorOffset: currentIndent,
     isBackward: true,

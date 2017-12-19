@@ -18,13 +18,14 @@ export default (editorState: EditorState): EditorState => {
 
   const modifiedContent = Modifier.removeRange(
     contentState,
-    selection.merge({
+    <Draft.SelectionState>selection.merge({
       anchorKey: startKey,
       anchorOffset: 0,
       focusKey: blockAfter.getKey(),
       focusOffset: 0,
       isBackward: false,
     }),
+    'forward',
   );
 
   const newState = EditorState.push(
@@ -35,7 +36,7 @@ export default (editorState: EditorState): EditorState => {
 
   return EditorState.forceSelection(
     newState,
-    selection.merge({
+    <Draft.SelectionState>selection.merge({
       anchorKey: endKey,
       anchorOffset: initialFocusOffset,
       focusKey: endKey,

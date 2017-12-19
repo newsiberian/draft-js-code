@@ -2,6 +2,7 @@ import * as Draft from 'draft-js';
 
 import moveSelectionToStartOfText from './utils/moveSelectionToStartOfText';
 import deleteBlocks from './utils/deleteBlocks';
+import duplicateBlocks from './utils/duplicateBlocks';
 import { removeIndent } from './utils/removeIndent';
 
 type DraftCodeEditorCommand =
@@ -37,7 +38,7 @@ export const handleKeyCommand = (
     case 'selection-to-start-of-text':
       return moveSelectionToStartOfText(editorState);
     case 'duplicate-blocks':
-      return null;
+      return duplicateBlocks(editorState);
     case 'delete-blocks':
       return deleteBlocks(editorState);
     default:

@@ -26,7 +26,7 @@ It works well with [`draft-js-prism`](https://github.com/SamyPesse/draft-js-pris
 - [x] Handle input of pair characters like `()`, `[]`, `{}`, `""`, `''`, ` `` `, etc. ([#3](https://github.com/SamyPesse/draft-js-code/issues/3))
 - [x] Implement code block depth based on pair characters
 - [x] Move cursor to the text beginning with <kbd>HOME</kbd>
-- [ ] Duplicate current line or selected block with <kbd>CTRL</kbd>+<kbd>D</kbd>
+- [x] Duplicate current line or selected block with <kbd>CTRL</kbd>+<kbd>D</kbd>
 - [x] Delete line at caret with <kbd>CTRL</kbd>+<kbd>Y</kbd>
 
 ### Installation

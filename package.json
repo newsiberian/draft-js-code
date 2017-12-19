@@ -1,6 +1,6 @@
 {
   "name": "draft-js-code-custom",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description":
     "Collection of utilities to make code blocks edition easy in DraftJS",
   "main": "./lib/bundle.umd.js",

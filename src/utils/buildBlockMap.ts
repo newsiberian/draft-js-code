@@ -1,9 +1,10 @@
-import { BlockMapBuilder, ContentBlock, genKey } from 'draft-js';
+import { BlockMapBuilder, ContentBlock } from 'draft-js';
 
 import * as Draft from 'draft-js';
 import * as Immutable from 'immutable';
 
 import { detectIndentation } from './detectIndentation';
+import { createNewBlock } from './createNewBlock';
 import { genCharacterList } from './genCharacterList';
 import { blockChars } from './specialChars';
 
@@ -67,15 +68,4 @@ export const buildBlockMap = (
     selectionKey: lastBlock.getKey(),
     selectionOffset: lastBlock.getLength(),
   };
-};
-
-const createNewBlock = (donor: ContentBlock, text: string): ContentBlock => {
-  return new ContentBlock({
-    characterList: genCharacterList(text),
-    data: donor.getData(),
-    depth: donor.getDepth(),
-    key: genKey(),
-    text,
-    type: donor.getType(),
-  });
 };
