@@ -20,6 +20,14 @@ jest.mock('../utils/moveSelectionToStartOfText', () => {
   return jest.fn(() => 'moveSelectionToStartOfText called');
 });
 
+jest.mock('../utils/deleteBlocks', () => {
+  return jest.fn(() => 'deleteBlocks called');
+});
+
+jest.mock('../utils/duplicateBlocks', () => {
+  return jest.fn(() => 'duplicateBlocks called');
+});
+
 describe('backspace', () => {
   describe('when cursor at the native indentation depth for current line', () => {
     //
@@ -253,6 +261,30 @@ describe('selection-to-start-of-text', () => {
     const editorState = createWithText('');
     const result = handleKeyCommand(editorState, 'selection-to-start-of-text');
     expect(result).toBe('moveSelectionToStartOfText called');
+  });
+});
+
+describe('delete-blocks', () => {
+  afterAll(() => {
+    jest.unmock('../utils/deleteBlocks');
+  });
+
+  it('should call deleteBlocks', () => {
+    const editorState = createWithText('');
+    const result = handleKeyCommand(editorState, 'delete-blocks');
+    expect(result).toBe('deleteBlocks called');
+  });
+});
+
+describe('duplicate-blocks', () => {
+  afterAll(() => {
+    jest.unmock('../utils/duplicateBlocks');
+  });
+
+  it('should call deleteBlocks', () => {
+    const editorState = createWithText('');
+    const result = handleKeyCommand(editorState, 'duplicate-blocks');
+    expect(result).toBe('duplicateBlocks called');
   });
 });
 

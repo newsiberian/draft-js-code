@@ -1,6 +1,13 @@
 import { EditorState, Modifier } from 'draft-js';
 
-export const deleteBlocks = (editorState: EditorState): EditorState => {
+/**
+ * Removes selected blocks entirely with moving cursor to the same position
+ * where focusOffset was to the next block after selection end
+ * @param {Draft.Model.ImmutableData.EditorState} editorState
+ * @return {Draft.Model.ImmutableData.EditorState}
+ */
+export default (editorState: EditorState): EditorState => {
+  // exported as default for tests
   const contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
   // after blocks remove we should move caret to the previous position

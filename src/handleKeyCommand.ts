@@ -1,8 +1,8 @@
 import * as Draft from 'draft-js';
 
 import moveSelectionToStartOfText from './utils/moveSelectionToStartOfText';
+import deleteBlocks from './utils/deleteBlocks';
 import { removeIndent } from './utils/removeIndent';
-import { deleteBlocks } from './utils/deleteBlocks';
 
 type DraftCodeEditorCommand =
   | Draft.DraftEditorCommand
