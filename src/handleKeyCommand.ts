@@ -2,10 +2,23 @@ import * as Draft from 'draft-js';
 
 import moveSelectionToStartOfText from './utils/moveSelectionToStartOfText';
 import { removeIndent } from './utils/removeIndent';
+import { deleteBlocks } from './utils/deleteBlocks';
 
 type DraftCodeEditorCommand =
   | Draft.DraftEditorCommand
-  | 'move-selection-to-start-of-text';
+  /**
+   * Move selection to the text beginning position, or if it already there, to
+   * start of the line
+   */
+  | 'selection-to-start-of-text'
+  /**
+   * Duplicate current block or selected blocks
+   */
+  | 'duplicate-blocks'
+  /**
+   * Delete line at caret or selected blocks
+   */
+  | 'delete-blocks';
 
 /**
  * Handle key command for code blocks
@@ -21,8 +34,12 @@ export const handleKeyCommand = (
     case 'backspace':
       // here undefined could be returned
       return removeIndent(editorState, false);
-    case 'move-selection-to-start-of-text':
+    case 'selection-to-start-of-text':
       return moveSelectionToStartOfText(editorState);
+    case 'duplicate-blocks':
+      return null;
+    case 'delete-blocks':
+      return deleteBlocks(editorState);
     default:
       return undefined;
   }

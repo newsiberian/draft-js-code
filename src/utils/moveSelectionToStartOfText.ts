@@ -20,11 +20,18 @@ export default (
   const newSelectionPosition =
     selection.getFocusOffset() === currentIndent ? 0 : currentIndent;
 
+  // in draft-js 0.10.4 we could faced with bug. If you start typing from the
+  // first line w/o indent and at the end of you text (in this first line) try
+  // to execute this code (force change selection to offset: 0) the caret will
+  // stay at the same place as before, but selection will show you offsets = 0.
+  // If you press 'inserting new line' then it will move text from the line
+  // beginning
+
   return EditorState.set(editorState, {
     selection: selection.merge({
-      anchorKey: currentBlock.getKey(),
+      anchorKey: startKey,
       anchorOffset: newSelectionPosition,
-      focusKey: currentBlock.getKey(),
+      focusKey: startKey,
       focusOffset: newSelectionPosition,
       isBackward: false,
     }),

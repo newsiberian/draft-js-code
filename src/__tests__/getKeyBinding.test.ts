@@ -9,7 +9,7 @@ describe('HOME binding', () => {
 
   it('should return command', () => {
     evt.ctrlKey = false;
-    expect(getKeyBinding(evt)).toBe('move-selection-to-start-of-text');
+    expect(getKeyBinding(evt)).toBe('selection-to-start-of-text');
   });
 
   it('should return null if ctrl modifier pressed', () => {

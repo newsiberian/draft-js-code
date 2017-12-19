@@ -244,17 +244,14 @@ ${textWithIndent}
   });
 });
 
-describe('move-selection-to-start-of-text', () => {
+describe('selection-to-start-of-text', () => {
   afterAll(() => {
     jest.unmock('../utils/moveSelectionToStartOfText');
   });
 
   it('should call moveSelectionToStartOfText', () => {
     const editorState = createWithText('');
-    const result = handleKeyCommand(
-      editorState,
-      'move-selection-to-start-of-text',
-    );
+    const result = handleKeyCommand(editorState, 'selection-to-start-of-text');
     expect(result).toBe('moveSelectionToStartOfText called');
   });
 });

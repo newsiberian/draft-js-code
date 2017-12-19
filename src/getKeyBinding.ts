@@ -13,8 +13,12 @@ export const getKeyBinding = (e: SyntheticKeyboardEvent): string | null => {
   switch (e.keyCode) {
     case 36: // HOME
       return !KeyBindingUtil.isCtrlKeyCommand(e)
-        ? 'move-selection-to-start-of-text'
+        ? 'selection-to-start-of-text'
         : null;
+    case 89: // Y
+      return KeyBindingUtil.hasCommandModifier(e) ? 'delete-blocks' : null;
+    case 68: // D
+      return KeyBindingUtil.hasCommandModifier(e) ? 'duplicate-blocks' : null;
     default:
       return null;
   }
