@@ -4,11 +4,7 @@ import duplicateBlocks from '../utils/duplicateBlocks';
 import {
   toPlainText,
   contentWithThreeBlocks,
-  createWithText,
   createSelection,
-  initialText,
-  indentLength,
-  insertIndentsBeforeText,
   firstText,
   secondText,
   thirdText,
