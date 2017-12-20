@@ -2,7 +2,7 @@ import { EditorState, Modifier } from 'draft-js';
 
 import * as React from 'react';
 
-import { getIndentation } from './utils/getIndentation';
+import getIndentation from './utils/getIndentation';
 import { detectIndentation } from './utils/detectIndentation';
 import { removeIndent } from './utils/removeIndent';
 import { getSelectedBlocks } from './utils/getSelectedBlocks';

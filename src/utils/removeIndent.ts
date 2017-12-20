@@ -5,7 +5,7 @@ import * as Immutable from 'immutable';
 
 import { detectIndentation } from './detectIndentation';
 import { getSelectedBlocks } from './getSelectedBlocks';
-import { getIndentation } from './getIndentation';
+import getIndentation from './getIndentation';
 
 export interface NewStateInterface {
   editorState: EditorState;
@@ -59,13 +59,13 @@ export const removeIndent = (
 
   // if previous block was not `code-block` and we are at the beginning of line,
   // we don't do any action to prevent current `code-block` removing
-  if (currentIndent < 1 && startOffset < 1) {
-    if (
-      typeof lastBlockBefore === 'undefined' ||
-      lastBlockBefore.getType() !== currentBlock.getType()
-    ) {
-      return editorState;
-    }
+  if (
+    currentIndent < 1 &&
+    startOffset < 1 &&
+    (typeof lastBlockBefore === 'undefined' ||
+      lastBlockBefore.getType() !== currentBlock.getType())
+  ) {
+    return editorState;
   }
 
   const newState = <NewStateInterface>{

@@ -5,6 +5,7 @@ import {
   createSelection,
   insertIndentsBeforeText,
   initialText,
+  indentLength,
   toPlainText,
 } from './utils';
 
@@ -75,4 +76,28 @@ it('should move text after cursor to the next line (new block)', () => {
   expect(toPlainText(after)).toEqual(`${textBeginning}\n${textEnd}`);
 });
 
-it('should move indentation after inserting new line if cursor was between special characters, like "", {}, (), etc', () => {});
+it('should move indentation after inserting new line if cursor was between special characters, like "", {}, (), etc', () => {
+  const currentContent = ContentState.createFromText('{}');
+  const selection = createSelection(currentContent)
+    .set('anchorOffset', 1)
+    .set('focusOffset', 1);
+  const before = EditorState.create({ currentContent, selection });
+  const after = handleReturn({}, before);
+
+  expect(toPlainText(after)).toEqual(
+    `${'{'}\n${insertIndentsBeforeText(1, '')}\n${'}'}`,
+  );
+});
+
+it('should act as always if no closed char after opening block char (`{`, `[`, `(`)', () => {
+  const currentContent = ContentState.createFromText('{');
+  const selection = createSelection(currentContent)
+    .set('anchorOffset', 1)
+    .set('focusOffset', 1);
+  const before = EditorState.create({ currentContent, selection });
+  const after = handleReturn({}, before);
+
+  expect(toPlainText(after)).toEqual(
+    `${'{'}\n${insertIndentsBeforeText(1, '')}`,
+  );
+});

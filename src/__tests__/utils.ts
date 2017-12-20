@@ -1,6 +1,6 @@
 import { EditorState, ContentState, SelectionState } from 'draft-js';
 
-import { getIndentation } from '../utils/getIndentation';
+import getIndentation from '../utils/getIndentation';
 
 export const toPlainText = (editorState: Draft.EditorState): string =>
   editorState.getCurrentContent().getPlainText();

@@ -1,7 +1,7 @@
 import detectIndent from 'detect-indent';
 import * as Draft from 'draft-js';
 
-import { getIndentation } from './getIndentation';
+import getIndentation from './getIndentation';
 import { blockChars } from './specialChars';
 
 /**

@@ -238,17 +238,32 @@ ${textWithIndent}
       firstBlock,
       secondBlock,
     ]);
+
+    expect(firstBlock).toBeDefined();
+    expect(firstBlock.getType()).not.toBe(secondBlock.getType());
+
     const selectSecondBlock = createSelection(currentContent)
       .set('anchorOffset', 0)
       .set('focusOffset', 0);
     const editorState = EditorState.create({
-      allowUndo: true,
       currentContent,
       selection: selectSecondBlock,
     });
 
     const after = handleKeyCommand(editorState, 'backspace');
     expect(toPlainText(after)).toEqual(toPlainText(editorState));
+
+    const currentContentTwo = ContentState.createFromBlockArray([firstBlock]);
+    const selectFirstBlock = createSelection(currentContentTwo)
+      .set('anchorOffset', 0)
+      .set('focusOffset', 0);
+    const editorStateTwo = EditorState.create({
+      currentContent: currentContentTwo,
+      selection: selectFirstBlock,
+    });
+
+    const afterTwo = handleKeyCommand(editorStateTwo, 'backspace');
+    expect(toPlainText(afterTwo)).toEqual(toPlainText(editorStateTwo));
   });
 });
 

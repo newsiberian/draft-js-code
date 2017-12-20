@@ -22,6 +22,9 @@ export const getSelectedBlocks = (
       return false;
     } else if (key === startKey) {
       state = true;
+      if (key === endKey) {
+        endPassed = true;
+      }
     } else if (key === endKey) {
       endPassed = true;
     }

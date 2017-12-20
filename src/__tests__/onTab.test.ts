@@ -162,6 +162,60 @@ ${insertIndentsBeforeText(3, lineTwo)}
 ${insertIndentsBeforeText(2, lineThree)}`,
     );
   });
+
+  it('should keep selection position while indent several lines', () => {
+    const lineOne = 'function test() {';
+    const lineTwo = 'return "This is test";';
+    const lineThree = '}';
+    const combinedText = `${insertIndentsBeforeText(1, lineOne)}
+${insertIndentsBeforeText(2, lineTwo)}
+${insertIndentsBeforeText(1, lineThree)}`;
+    const currentContent = ContentState.createFromText(combinedText);
+    const contentBlocks = currentContent.getBlockMap();
+    const firstBlockKey = contentBlocks.first().getKey();
+    const lastBlockKey = contentBlocks.last().getKey();
+    const selection = createSelection(currentContent);
+    const allBlocksSelection = selection.merge({
+      focusKey: lastBlockKey,
+      focusOffset: 3, // random offset
+      anchorKey: firstBlockKey,
+      anchorOffset: 4, // random offset
+    });
+
+    const before = EditorState.create({
+      currentContent,
+      selection: allBlocksSelection,
+    });
+    const after = onTab(evt, before);
+    const selectionAfter = after.getSelection();
+    const anchorOffsetAfter = selectionAfter.getAnchorOffset();
+    const focusOffsetAfter = selectionAfter.getFocusOffset();
+
+    expect(anchorOffsetAfter).toBe(4 + indentLength);
+    expect(focusOffsetAfter).toBe(3 + indentLength);
+
+    // backward case
+
+    const backwardSelection = selection.merge({
+      focusKey: firstBlockKey,
+      focusOffset: 4, // random offset
+      anchorKey: lastBlockKey,
+      anchorOffset: 3, // random offset
+      isBackward: true,
+    });
+
+    const backwardBefore = EditorState.create({
+      currentContent,
+      selection: backwardSelection,
+    });
+    const backwardAfter = onTab(evt, backwardBefore);
+    const backwardSelectionAfter = backwardAfter.getSelection();
+    const backwardAnchorOffsetAfter = backwardSelectionAfter.getAnchorOffset();
+    const backwardFocusOffsetAfter = backwardSelectionAfter.getFocusOffset();
+
+    expect(backwardAnchorOffsetAfter).toBe(3 + indentLength);
+    expect(backwardFocusOffsetAfter).toBe(4 + indentLength);
+  });
 });
 
 describe('on Shift+Tab', () => {
@@ -328,70 +382,126 @@ describe('on Shift+Tab', () => {
     expect(toPlainText(after)).toEqual(textWithOneIndent);
   });
 
-  it('should correctly remove indentation for several selected lines', () => {
-    const lineOne = 'function test() {';
-    const lineTwo = 'return "This is test";';
-    const lineThree = '}';
-    const combinedText = `${insertIndentsBeforeText(1, lineOne)}
+  describe('several blocks selected', () => {
+    it('should correctly remove indentation', () => {
+      const lineOne = 'function test() {';
+      const lineTwo = 'return "This is test";';
+      const lineThree = '}';
+      const combinedText = `${insertIndentsBeforeText(1, lineOne)}
 ${insertIndentsBeforeText(2, lineTwo)}
 ${insertIndentsBeforeText(1, lineThree)}`;
-    const currentContent = ContentState.createFromText(combinedText);
-    const contentBlocks = currentContent.getBlockMap();
-    const firstBlockKey = contentBlocks.first().getKey();
-    const lastBlockKey = contentBlocks.last().getKey();
-    const selection = createSelection(currentContent);
-    const allBlocksSelection = selection.merge({
-      focusKey: lastBlockKey,
-      focusOffset: 3, // random offset
-      anchorKey: firstBlockKey,
-      anchorOffset: 4, // random offset
-    });
+      const currentContent = ContentState.createFromText(combinedText);
+      const contentBlocks = currentContent.getBlockMap();
+      const firstBlockKey = contentBlocks.first().getKey();
+      const lastBlockKey = contentBlocks.last().getKey();
+      const selection = createSelection(currentContent);
+      const allBlocksSelection = selection.merge({
+        focusKey: lastBlockKey,
+        focusOffset: 3, // random offset
+        anchorKey: firstBlockKey,
+        anchorOffset: 4, // random offset
+      });
 
-    const before = EditorState.create({
-      allowUndo: true,
-      currentContent,
-      selection: allBlocksSelection,
-    });
-    const after = onTab(evt, before);
+      const before = EditorState.create({
+        allowUndo: true,
+        currentContent,
+        selection: allBlocksSelection,
+      });
+      const after = onTab(evt, before);
 
-    expect(toPlainText(after)).toEqual(
-      `${lineOne}
+      expect(toPlainText(after)).toEqual(
+        `${lineOne}
 ${insertIndentsBeforeText(1, lineTwo)}
 ${lineThree}`,
-    );
-  });
+      );
+    });
 
-  it('should return previous state if current indent of selected lines is 0', () => {
-    const lineOne = 'function test() {';
-    const lineTwo = 'return "This is test";';
-    const lineThree = '}';
-    const combinedText = `${insertIndentsBeforeText(1, lineOne)}
+    it('should keep selection position while removing indent', () => {
+      const lineOne = 'function test() {';
+      const lineTwo = 'return "This is test";';
+      const lineThree = '}';
+      const combinedText = `${insertIndentsBeforeText(1, lineOne)}
+${insertIndentsBeforeText(2, lineTwo)}
+${insertIndentsBeforeText(1, lineThree)}`;
+      const currentContent = ContentState.createFromText(combinedText);
+      const contentBlocks = currentContent.getBlockMap();
+      const firstBlockKey = contentBlocks.first().getKey();
+      const lastBlockKey = contentBlocks.last().getKey();
+      const selection = createSelection(currentContent);
+      const allBlocksSelection = selection.merge({
+        focusKey: lastBlockKey,
+        focusOffset: 3, // random offset
+        anchorKey: firstBlockKey,
+        anchorOffset: 4, // random offset
+      });
+
+      const before = EditorState.create({
+        currentContent,
+        selection: allBlocksSelection,
+      });
+      const after = onTab(evt, before);
+      const selectionAfter = after.getSelection();
+      const anchorOffsetAfter = selectionAfter.getAnchorOffset();
+      const focusOffsetAfter = selectionAfter.getFocusOffset();
+
+      expect(anchorOffsetAfter).toBe(4 - indentLength);
+      expect(focusOffsetAfter).toBe(3 - indentLength);
+
+      // backward case
+
+      const backwardSelection = selection.merge({
+        focusKey: firstBlockKey,
+        focusOffset: 4, // random offset
+        anchorKey: lastBlockKey,
+        anchorOffset: 3, // random offset
+        isBackward: true,
+      });
+
+      const backwardBefore = EditorState.create({
+        currentContent,
+        selection: backwardSelection,
+      });
+      const backwardAfter = onTab(evt, backwardBefore);
+      const backwardSelectionAfter = backwardAfter.getSelection();
+      const backwardAnchorOffsetAfter = backwardSelectionAfter.getAnchorOffset();
+      const backwardFocusOffsetAfter = backwardSelectionAfter.getFocusOffset();
+
+      expect(backwardAnchorOffsetAfter).toBe(3 - indentLength);
+      expect(backwardFocusOffsetAfter).toBe(4 - indentLength);
+    });
+
+    it('should return previous state if current indent of selected lines is 0', () => {
+      const lineOne = 'function test() {';
+      const lineTwo = 'return "This is test";';
+      const lineThree = '}';
+      const combinedText = ` ${lineOne}
 ${lineTwo}
 ${insertIndentsBeforeText(1, lineThree)}`;
-    const currentContent = ContentState.createFromText(combinedText);
-    const contentBlocks = currentContent.getBlockMap();
-    const firstBlockKey = contentBlocks.first().getKey();
-    const lastBlockKey = contentBlocks.last().getKey();
-    const selection = createSelection(currentContent);
-    const allBlocksSelection = selection.merge({
-      focusKey: lastBlockKey,
-      focusOffset: 3, // random offset
-      anchorKey: firstBlockKey,
-      anchorOffset: 4, // random offset
-    });
+      const currentContent = ContentState.createFromText(combinedText);
+      const contentBlocks = currentContent.getBlockMap();
+      const firstBlockKey = contentBlocks.first().getKey();
+      const lastBlockKey = contentBlocks.last().getKey();
+      const selection = createSelection(currentContent);
+      const allBlocksSelection = selection.merge({
+        focusKey: lastBlockKey,
+        focusOffset: 3, // random offset
+        anchorKey: firstBlockKey,
+        anchorOffset: 4, // random offset
+      });
 
-    const before = EditorState.create({
-      allowUndo: true,
-      currentContent,
-      selection: allBlocksSelection,
-    });
-    const after = onTab(evt, before);
+      const before = EditorState.create({
+        allowUndo: true,
+        currentContent,
+        selection: allBlocksSelection,
+      });
+      const after = onTab(evt, before);
 
-    expect(toPlainText(after)).toEqual(
-      `${lineOne}
+      expect(toPlainText(after)).toEqual(
+        `${lineOne}
 ${lineTwo}
 ${lineThree}`,
-    );
+      );
+    });
   });
 
   it('should skip handling when text beginning from the content-block beginning', () => {
@@ -409,19 +519,36 @@ ${lineThree}`,
       firstBlock,
       secondBlock,
     ]);
+
+    expect(firstBlock).toBeDefined();
+    expect(firstBlock.getType()).not.toBe(secondBlock.getType());
+
     const selectSecondBlock = createSelection(currentContent)
       .set('anchorKey', 'a2')
       .set('anchorOffset', 0)
       .set('focusKey', 'a2')
       .set('focusOffset', 0);
     const editorState = EditorState.create({
-      allowUndo: true,
       currentContent,
       selection: selectSecondBlock,
     });
 
     const after = onTab(evt, editorState);
     expect(toPlainText(after)).toEqual(toPlainText(editorState));
+
+    const currentContentTwo = ContentState.createFromBlockArray([firstBlock]);
+    const selectFirstBlock = createSelection(currentContentTwo)
+      .set('anchorKey', 'a1')
+      .set('anchorOffset', 0)
+      .set('focusKey', 'a1')
+      .set('focusOffset', 0);
+    const editorStateTwo = EditorState.create({
+      currentContent: currentContentTwo,
+      selection: selectFirstBlock,
+    });
+
+    const afterTwo = onTab(evt, editorStateTwo);
+    expect(toPlainText(afterTwo)).toEqual(toPlainText(editorStateTwo));
   });
 
   it('should skip using as `lastBlockBefore` block of the another type than current', () => {
@@ -452,6 +579,7 @@ ${lineThree}`,
     });
 
     const after = onTab(evt, editorState);
+    expect(firstBlock.getType()).not.toBe(secondBlock.getType());
     expect(toPlainText(after)).toEqual(
       `${firstText}\n${insertIndentsBeforeText(1, secondText)}`,
     );
