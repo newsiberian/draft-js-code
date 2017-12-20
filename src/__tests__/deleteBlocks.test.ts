@@ -1,42 +1,25 @@
-import { EditorState, ContentState, ContentBlock } from 'draft-js';
+import { EditorState } from 'draft-js';
 
 import deleteBlocks from '../utils/deleteBlocks';
-import { createSelection, insertIndentsBeforeText, toPlainText } from './utils';
-
-const firstText = 'function () {';
-const firstBlock = new ContentBlock({
-  key: 'a1',
-  text: firstText,
-  type: 'code-block',
-});
-const secondText = insertIndentsBeforeText(1, "const x = 'hello';");
-const secondBlock = new ContentBlock({
-  key: 'a2',
-  text: secondText,
-  type: 'code-block',
-});
-const thirdText = insertIndentsBeforeText(3, 'const str = `this is test`;');
-const thirdBlock = new ContentBlock({
-  key: 'a3',
-  text: thirdText,
-  type: 'code-block',
-});
-const currentContent = ContentState.createFromBlockArray([
-  firstBlock,
-  secondBlock,
-  thirdBlock,
-]);
+import {
+  contentWithThreeBlocks,
+  createSelection,
+  toPlainText,
+  firstText,
+  secondText,
+  thirdText,
+} from './utils';
 
 it('should remove block with collapsed selection with moving next block to the position of current', () => {
   const offset = Math.floor(secondText.length / 2);
-  const secondBlockSelection = createSelection(currentContent)
+  const secondBlockSelection = createSelection(contentWithThreeBlocks)
     .set('anchorKey', 'a2')
     .set('anchorOffset', offset)
     .set('focusKey', 'a2')
     .set('focusOffset', offset);
 
   const editorState = EditorState.create({
-    currentContent,
+    currentContent: contentWithThreeBlocks,
     selection: secondBlockSelection,
   });
 
@@ -47,14 +30,14 @@ it('should remove block with collapsed selection with moving next block to the p
 
 it('should save caret (focusOffset) position after deletion', () => {
   const offset = Math.floor(secondText.length / 2);
-  const secondBlockSelection = createSelection(currentContent)
+  const secondBlockSelection = createSelection(contentWithThreeBlocks)
     .set('anchorKey', 'a2')
     .set('anchorOffset', offset)
     .set('focusKey', 'a2')
     .set('focusOffset', offset);
 
   const editorState = EditorState.create({
-    currentContent,
+    currentContent: contentWithThreeBlocks,
     selection: secondBlockSelection,
   });
 
@@ -67,14 +50,14 @@ it('should save caret (focusOffset) position after deletion', () => {
 
 it('should remove several blocks', () => {
   const offset = Math.floor(secondText.length / 2);
-  const secondBlockSelection = createSelection(currentContent)
+  const secondBlockSelection = createSelection(contentWithThreeBlocks)
     .set('anchorKey', 'a1')
     .set('anchorOffset', offset)
     .set('focusKey', 'a2')
     .set('focusOffset', offset);
 
   const editorState = EditorState.create({
-    currentContent,
+    currentContent: contentWithThreeBlocks,
     selection: secondBlockSelection,
   });
 
