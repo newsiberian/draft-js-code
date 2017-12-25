@@ -5,9 +5,6 @@ This is a fork of [draft-js-code](https://github.com/SamyPesse/draft-js-code)
 ### Attention
 It differs from the original package by slanting to work in conditions where each line is a separate `CodeBlock`. You must provide such conditions by yourself.
 
-[![NPM version](https://badge.fury.io/js/draft-js-code.svg)](http://badge.fury.io/js/draft-js-code)
-[![Coverage Status](https://coveralls.io/repos/github/SamyPesse/draft-js-code/badge.svg?branch=master)](https://coveralls.io/github/SamyPesse/draft-js-code?branch=master)
-
 `draft-js-code-custom` is a collection of low-level utilities to make code block editing in DraftJS editors nicer.
 
 <!-- If you're using `draft-js-plugins`, check out the [`draft-js-code-plugin`](https://github.com/withspectrum/draft-js-code-plugin) wrapper around this library. -->

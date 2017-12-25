@@ -1,6 +1,6 @@
 {
   "name": "draft-js-code-custom",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description":
     "Collection of utilities to make code blocks edition easy in DraftJS",
   "main": "./lib/bundle.umd.js",
@@ -19,14 +19,13 @@
     "lint-fix":
       "prettier --trailing-comma all --single-quote --write \"src/**/*.{j,t}s*\"",
     "lint-staged": "lint-staged",
-    "deploy": "npm run build; gh-pages -d ./demo",
     "watch": "tsc -w -p .",
     "serve": "http-server -p 9090 demo/",
     "start":
       "npm run build:browser; parallelshell 'npm run serve -s' 'npm run watch -s'",
     "prebuild": "npm run clean",
     "postbuild": "npm run bundle",
-    "postpublish": "npm run deploy",
+    "prepublishOnly": "npm run clean && npm run build",
     "test": "jest --coverage"
   },
   "repository": {
